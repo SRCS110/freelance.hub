@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FreelanceHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="client/css/styles.css"/>
+</head>
+<body>
+<div id="app">
+  <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0f1117;color:#64748b;font-size:14px">
+    Loading…
+  </div>
+</div>
+
+<!--
+  Load order matters:
+  1. config        — credentials
+  2. supabase      — db client
+  3. auth          — session helpers (needs supabase)
+  4. utils         — shared helpers
+  5. pages         — each page renderer
+  6. app           — router + boot (must be last)
+-->
+<script src="config/config.js"></script>
+<script src="client/js/supabase.js"></script>
+<script src="client/js/auth.js"></script>
+<script src="client/js/utils.js"></script>
+<script src="client/pages/dashboard.js"></script>
+<script src="client/pages/clients.js"></script>
+<script src="client/pages/projects.js"></script>
+<script src="client/pages/finances.js"></script>
+<script src="client/pages/invoices.js"></script>
+<script src="client/pages/business-plan.js"></script>
+<script src="client/js/app.js"></script>
+
+</body>
+</html>

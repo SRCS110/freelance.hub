@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FreelanceHub — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="client/css/styles.css"/>
+<style>
+  body { overflow: auto; background: #fff; }
+</style>
+</head>
+<body>
+<canvas id="swirl-canvas"></canvas>
+
+<!-- ── Setup screen (first-run only) ── -->
+<div id="setup-screen" style="display:none">
+  <div class="setup-wrap" style="position:relative;z-index:1">
+    <div class="setup-card">
+      <div class="setup-logo">FreelanceHub</div>
+      <div class="setup-tagline">Your all-in-one business command center</div>
+      <div class="setup-step">One-time setup — Connect your database</div>
+      <div id="setup-error" class="setup-error" style="display:none"></div>
+      <div>
+        <label class="setup-field-label">Supabase Project URL</label>
+        <input class="setup-input" id="setup-url" type="url"
+          placeholder="https://xxxx.supabase.co" spellcheck="false" autocomplete="off"/>
+        <div class="setup-hint">💡 Supabase Dashboard → Settings → API → Project URL</div>
+      </div>
+      <div>
+        <label class="setup-field-label">Supabase Anon Key</label>
+        <input class="setup-input" id="setup-key" type="password"
+          placeholder="eyJhbGci…" spellcheck="false" autocomplete="off"/>
+        <div class="setup-hint">💡 Supabase Dashboard → Settings → API → anon public key</div>
+      </div>
+      <button class="setup-btn" id="setup-btn" onclick="saveSetup()">
+        Connect &amp; Continue →
+      </button>
+      <div style="font-size:11px;color:#cbd5e1;text-align:center;margin-top:16px;line-height:1.6">
+        Credentials are saved locally on this device only.<br/>
+        This screen will never appear again after connecting.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Login / Signup screen ── -->
+<div id="auth-screen" style="display:none">
+  <div class="auth-wrap" style="position:relative;z-index:1">
+    <div class="auth-card">
+      <div class="auth-logo">FreelanceHub</div>
+      <div class="auth-tagline">Your all-in-one business command center</div>
+
+      <div id="auth-error"   class="msg-error" style="display:none"></div>
+      <div id="auth-success" class="msg-ok"    style="display:none"></div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input id="auth-email" type="email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input id="auth-pw" type="password" placeholder="••••••••"/>
+      </div>
+
+      <button class="btn btn-primary" id="auth-btn" onclick="handleAuth()">Sign In</button>
+
+      <!-- Google OAuth button — hidden until config.js has google_client_id -->
+      <div id="google-btn-wrap" style="display:none;margin-top:12px">
+        <button class="btn" id="google-btn" onclick="googleOAuth.login()"
+          style="width:100%;padding:11px;background:#fff;color:#1e293b;border:1px solid #e2e8f0;
+                 display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;
+                 border-radius:10px;box-shadow:0 1px 4px #0001">
+          <svg width="18" height="18" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </div>
+
+      <div class="auth-toggle" id="auth-toggle">
+        No account? <span class="auth-link" onclick="setMode('signup')">Create one</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="config/config.js"></script>
+<script src="client/js/supabase.js"></script>
+<script src="client/js/auth.js"></script>
+<script src="client/js/utils.js"></script>
+<script>
+  // ── Mode: 'login' or 'signup' ──────────────────────────────
+  let _mode = "login";
+
+  function setMode(m) {
+    _mode = m;
+    document.getElementById("auth-btn").textContent    = m === "signup" ? "Create Account" : "Sign In";
+    document.getElementById("auth-toggle").innerHTML   = m === "login"
+      ? `No account? <span class="auth-link" onclick="setMode('signup')">Create one</span>`
+      : `Have an account? <span class="auth-link" onclick="setMode('login')">Sign in</span>`;
+    clearMessages();
+  }
+
+  function showError(msg)   { const el = document.getElementById("auth-error");   el.textContent = msg; el.style.display = "block"; }
+  function showSuccess(msg) { const el = document.getElementById("auth-success"); el.textContent = msg; el.style.display = "block"; }
+  function clearMessages()  {
+    document.getElementById("auth-error").style.display   = "none";
+    document.getElementById("auth-success").style.display = "none";
+  }
+
+  // ── Handle email/password auth ─────────────────────────────
+  window.handleAuth = async function() {
+    const email = document.getElementById("auth-email").value.trim();
+    const pw    = document.getElementById("auth-pw").value;
+    if (!email || !pw) return;
+    clearMessages();
+    const btn = document.getElementById("auth-btn");
+    btn.textContent = "Please wait…"; btn.disabled = true;
+    try {
+      if (_mode === "signup") {
+        await signUp(email, pw);
+        showSuccess("Account created! Sign in below.");
+        setMode("login");
+      } else {
+        const data = await signIn(email, pw);
+        if (data?.user) {
+          window.location.href = "index.html";
+        } else {
+          throw new Error("Sign in failed.");
+        }
+      }
+    } catch(e) {
+      showError(e.message || "Something went wrong.");
+    }
+    btn.textContent = _mode === "signup" ? "Create Account" : "Sign In";
+    btn.disabled = false;
+  };
+
+  // ── Setup screen ───────────────────────────────────────────
+  window.saveSetup = async function() {
+    const url = document.getElementById("setup-url").value.trim();
+    const key = document.getElementById("setup-key").value.trim();
+    const errEl = document.getElementById("setup-error");
+    if (!url || !key) { errEl.textContent = "Please enter both fields."; errEl.style.display = "block"; return; }
+    const btn = document.getElementById("setup-btn");
+    btn.textContent = "Connecting…"; btn.disabled = true;
+    try {
+      const res = await fetch(url + "/auth/v1/settings", {
+        headers: { apikey: key, "Content-Type": "application/json" },
+      });
+      if (!res.ok) throw new Error("Connection failed. Check your URL and Anon Key.");
+      localStorage.setItem("fh_creds", JSON.stringify({ supabase_url: url, supabase_anon_key: key }));
+      stopSwirl();
+      boot();
+    } catch(e) {
+      errEl.textContent = e.message; errEl.style.display = "block";
+      btn.textContent = "Connect & Continue →"; btn.disabled = false;
+    }
+  };
+
+  // ── Boot sequence ──────────────────────────────────────────
+  async function boot() {
+    // If already logged in, go straight to app
+    const user = await restoreSession().catch(() => null);
+    if (user) { window.location.href = "index.html"; return; }
+
+    // Show setup screen if no config
+    if (!hasConfig()) {
+      document.getElementById("setup-screen").style.display = "block";
+      startSwirl();
+      document.getElementById("setup-url").addEventListener("keydown", e => { if(e.key==="Enter") saveSetup(); });
+      document.getElementById("setup-key").addEventListener("keydown", e => { if(e.key==="Enter") saveSetup(); });
+      return;
+    }
+
+    // Show login screen
+    document.getElementById("auth-screen").style.display = "block";
+    startSwirl();
+
+    // Show Google button if configured
+    if (window.FH_CONFIG?.google_client_id) {
+      document.getElementById("google-btn-wrap").style.display = "block";
+    }
+
+    // Handle Google OAuth callback (if redirected back)
+    if (window.location.hash.includes("access_token")) {
+      const token = googleOAuth.handleCallback();
+      if (token) { window.location.href = "index.html"; }
+    }
+
+    document.getElementById("auth-email").addEventListener("keydown", e => { if(e.key==="Enter") handleAuth(); });
+    document.getElementById("auth-pw").addEventListener("keydown",    e => { if(e.key==="Enter") handleAuth(); });
+  }
+
+  boot();
+</script>
+</body>
+</html>
