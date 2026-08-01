@@ -10,8 +10,8 @@
 //  key here — that one never touches the frontend.
 // ============================================================
 
-const SUPABASE_URL      = "YOUR_SUPABASE_URL";       // e.g. https://xxxx.supabase.co
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";  // Settings → API → anon public
+const SUPABASE_URL      = "https://mbprxgxtpwbaelrjwzam.supabase.co";       // e.g. https://xxxx.supabase.co
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1icHJ4Z3h0cHdiYWVscmp3emFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1MzAwNzYsImV4cCI6MjEwMTEwNjA3Nn0.4WFvWXlLVowHx0-OrQoT96V7WDnRx0SDRsGj7pB_-BA";  // Settings → API → anon public
 
 // ── Token keys ────────────────────────────────────────────────
 const TOKEN_KEY   = "fh_token";
