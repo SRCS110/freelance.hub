@@ -3,49 +3,15 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>FreelanceHub — Login</title>
+<title>FreelanceHub — Sign In</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="client/css/styles.css"/>
-<style>
-  body { overflow: auto; background: #fff; }
-</style>
+<style>body { overflow: auto; background: #fff; }</style>
 </head>
 <body>
 <canvas id="swirl-canvas"></canvas>
 
-<!-- ── Setup screen (first-run only) ── -->
-<div id="setup-screen" style="display:none">
-  <div class="setup-wrap" style="position:relative;z-index:1">
-    <div class="setup-card">
-      <div class="setup-logo">FreelanceHub</div>
-      <div class="setup-tagline">Your all-in-one business command center</div>
-      <div class="setup-step">One-time setup — Connect your database</div>
-      <div id="setup-error" class="setup-error" style="display:none"></div>
-      <div>
-        <label class="setup-field-label">Supabase Project URL</label>
-        <input class="setup-input" id="setup-url" type="url"
-          placeholder="https://xxxx.supabase.co" spellcheck="false" autocomplete="off"/>
-        <div class="setup-hint">💡 Supabase Dashboard → Settings → API → Project URL</div>
-      </div>
-      <div>
-        <label class="setup-field-label">Supabase Anon Key</label>
-        <input class="setup-input" id="setup-key" type="password"
-          placeholder="eyJhbGci…" spellcheck="false" autocomplete="off"/>
-        <div class="setup-hint">💡 Supabase Dashboard → Settings → API → anon public key</div>
-      </div>
-      <button class="setup-btn" id="setup-btn" onclick="saveSetup()">
-        Connect &amp; Continue →
-      </button>
-      <div style="font-size:11px;color:#cbd5e1;text-align:center;margin-top:16px;line-height:1.6">
-        Credentials are saved locally on this device only.<br/>
-        This screen will never appear again after connecting.
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── Login / Signup screen ── -->
-<div id="auth-screen" style="display:none">
+<div id="auth-screen">
   <div class="auth-wrap" style="position:relative;z-index:1">
     <div class="auth-card">
       <div class="auth-logo">FreelanceHub</div>
@@ -65,8 +31,7 @@
 
       <button class="btn btn-primary" id="auth-btn" onclick="handleAuth()">Sign In</button>
 
-      <!-- Google OAuth button — hidden until config.js has google_client_id -->
-      <div id="google-btn-wrap" style="display:none;margin-top:12px">
+      <div style="display:block;margin-top:12px">
         <button class="btn" id="google-btn" onclick="googleOAuth.login()"
           style="width:100%;padding:11px;background:#fff;color:#1e293b;border:1px solid #e2e8f0;
                  display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;
@@ -88,18 +53,15 @@
   </div>
 </div>
 
-<script src="config/config.js"></script>
-<script src="client/js/supabase.js"></script>
 <script src="client/js/auth.js"></script>
 <script src="client/js/utils.js"></script>
 <script>
-  // ── Mode: 'login' or 'signup' ──────────────────────────────
   let _mode = "login";
 
   function setMode(m) {
     _mode = m;
-    document.getElementById("auth-btn").textContent    = m === "signup" ? "Create Account" : "Sign In";
-    document.getElementById("auth-toggle").innerHTML   = m === "login"
+    document.getElementById("auth-btn").textContent  = m === "signup" ? "Create Account" : "Sign In";
+    document.getElementById("auth-toggle").innerHTML = m === "login"
       ? `No account? <span class="auth-link" onclick="setMode('signup')">Create one</span>`
       : `Have an account? <span class="auth-link" onclick="setMode('login')">Sign in</span>`;
     clearMessages();
@@ -112,7 +74,6 @@
     document.getElementById("auth-success").style.display = "none";
   }
 
-  // ── Handle email/password auth ─────────────────────────────
   window.handleAuth = async function() {
     const email = document.getElementById("auth-email").value.trim();
     const pw    = document.getElementById("auth-pw").value;
@@ -140,56 +101,27 @@
     btn.disabled = false;
   };
 
-  // ── Setup screen ───────────────────────────────────────────
-  window.saveSetup = async function() {
-    const url = document.getElementById("setup-url").value.trim();
-    const key = document.getElementById("setup-key").value.trim();
-    const errEl = document.getElementById("setup-error");
-    if (!url || !key) { errEl.textContent = "Please enter both fields."; errEl.style.display = "block"; return; }
-    const btn = document.getElementById("setup-btn");
-    btn.textContent = "Connecting…"; btn.disabled = true;
-    try {
-      const res = await fetch(url + "/auth/v1/settings", {
-        headers: { apikey: key, "Content-Type": "application/json" },
-      });
-      if (!res.ok) throw new Error("Connection failed. Check your URL and Anon Key.");
-      localStorage.setItem("fh_creds", JSON.stringify({ supabase_url: url, supabase_anon_key: key }));
-      stopSwirl();
-      boot();
-    } catch(e) {
-      errEl.textContent = e.message; errEl.style.display = "block";
-      btn.textContent = "Connect & Continue →"; btn.disabled = false;
-    }
-  };
-
-  // ── Boot sequence ──────────────────────────────────────────
   async function boot() {
-    // If already logged in, go straight to app
-    const user = await restoreSession().catch(() => null);
-    if (user) { window.location.href = "index.html"; return; }
-
-    // Show setup screen if no config
+    // If not configured yet, show a clear message instead of a broken screen
     if (!hasConfig()) {
-      document.getElementById("setup-screen").style.display = "block";
+      document.getElementById("auth-error").textContent =
+        "Supabase URL and anon key not set. Open client/js/auth.js and fill in SUPABASE_URL and SUPABASE_ANON_KEY.";
+      document.getElementById("auth-error").style.display = "block";
+      document.getElementById("auth-btn").disabled = true;
+      document.getElementById("google-btn").disabled = true;
       startSwirl();
-      document.getElementById("setup-url").addEventListener("keydown", e => { if(e.key==="Enter") saveSetup(); });
-      document.getElementById("setup-key").addEventListener("keydown", e => { if(e.key==="Enter") saveSetup(); });
       return;
     }
 
-    // Show login screen
-    document.getElementById("auth-screen").style.display = "block";
+    const user = await restoreSession().catch(() => null);
+    if (user) { window.location.href = "index.html"; return; }
+
     startSwirl();
 
-    // Show Google button if configured
-    if (window.FH_CONFIG?.google_client_id) {
-      document.getElementById("google-btn-wrap").style.display = "block";
-    }
-
-    // Handle Google OAuth callback (if redirected back)
+    // Handle Google OAuth callback
     if (window.location.hash.includes("access_token")) {
       const token = googleOAuth.handleCallback();
-      if (token) { window.location.href = "index.html"; }
+      if (token) { window.location.href = "index.html"; return; }
     }
 
     document.getElementById("auth-email").addEventListener("keydown", e => { if(e.key==="Enter") handleAuth(); });

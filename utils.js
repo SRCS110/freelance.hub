@@ -122,27 +122,3 @@ function stopSwirl() {
   }
 }
 
-// ── Per-project credential helpers ────────────────────────────
-function getProjectCreds(pid) {
-  try { return JSON.parse(localStorage.getItem("proj_creds_" + pid) || "{}"); }
-  catch { return {}; }
-}
-
-function saveProjectCreds(pid, creds) {
-  // Note: credentials are stored in localStorage (local device only).
-  // Do not store production secrets here in shared environments.
-  localStorage.setItem("proj_creds_" + pid, JSON.stringify(creds));
-}
-
-// Expose globally
-window.STATUS_COLORS    = STATUS_COLORS;
-window.TAX_CATS         = TAX_CATS;
-window.usd              = usd;
-window.fmtDate          = fmtDate;
-window.badge            = badge;
-window.showModal        = showModal;
-window.closeModal       = closeModal;
-window.startSwirl       = startSwirl;
-window.stopSwirl        = stopSwirl;
-window.getProjectCreds  = getProjectCreds;
-window.saveProjectCreds = saveProjectCreds;

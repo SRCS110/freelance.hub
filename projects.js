@@ -32,7 +32,7 @@ ${filtered.length === 0
     </div>`
   : `<div class="projects-grid">
       ${filtered.map(p => {
-        const creds = getProjectCreds(p.id);
+        const creds = (STATE.data.project_credentials || []).find(c => c.project_id === p.id) || {};
         const sbOk  = !!(creds.supabase_url && creds.supabase_anon_key);
         const goOk  = !!(creds.google_client_id && creds.google_client_secret);
         const col   = STATUS_COLORS[p.status] || "#64748b";
@@ -124,108 +124,36 @@ ${connPanelHTML(p.id)}
 </div>`;
 }
 
-// ── Connection Panel ──────────────────────────────────────────
-const CONN_FIELDS = [
-  { section: "Supabase", color: "#3ecf8e", icon: "⚡", fields: [
-    { key: "supabase_url",      label: "Project URL",  placeholder: "https://xxxx.supabase.co",              type: "url",      hint: "Settings → API → Project URL" },
-    { key: "supabase_anon_key", label: "Anon Key",     placeholder: "eyJhbGci…",                             type: "password", hint: "Settings → API → anon public key" },
-  ]},
-  { section: "Google OAuth", color: "#4285F4", icon: "G", fields: [
-    { key: "google_client_id",     label: "Client ID",     placeholder: "000000-xxx.apps.googleusercontent.com", type: "text",     hint: "Google Cloud Console → Credentials" },
-    { key: "google_client_secret", label: "Client Secret", placeholder: "GOCSPX-…",                              type: "password", hint: "Same page as Client ID" },
-    { key: "google_redirect_uri",  label: "Redirect URI",  placeholder: "https://xxxx.supabase.co/auth/v1/callback", type: "url", hint: "Add to Google Console AND Supabase Auth → Providers → Google" },
-  ]},
-];
-
+// ── Connection Panel ────────────────────────────────────────
 function connPanelHTML(pid) {
-  const c    = getProjectCreds(pid);
+  const c    = (STATE.data.project_credentials || []).find(c => c.project_id === pid) || {};
   const sbOk = !!(c.supabase_url && c.supabase_anon_key);
   const goOk = !!(c.google_client_id && c.google_client_secret && c.google_redirect_uri);
 
   return `
-<div class="conn-panel" id="conn-panel-${pid}">
-  <div class="conn-panel-header" onclick="toggleConn('${pid}')">
+<div class="conn-panel" style="margin-bottom:28px">
+  <div class="conn-panel-header" style="cursor:default">
     <div class="conn-panel-title">🔌 Connection Credentials</div>
     <div class="conn-badges">
       <span class="conn-badge ${sbOk ? "ok" : "miss"}">${sbOk ? "✓" : "○"} Supabase</span>
       <span class="conn-badge ${goOk ? "ok" : "miss"}">${goOk ? "✓" : "○"} Google OAuth</span>
-      <span id="conn-arrow-${pid}" style="color:#64748b;font-size:18px;margin-left:4px">▸</span>
+      <button class="btn btn-ghost btn-sm" style="margin-left:12px;font-size:11px"
+        onclick="navigate('settings')">Edit in Settings →</button>
     </div>
   </div>
-  <div id="conn-body-${pid}" style="display:none">
-    <div class="conn-body">
-      ${CONN_FIELDS.map(section => `
-      <div class="conn-section">
-        <div class="conn-section-label">
-          <span class="conn-section-icon" style="background:${section.color}22;color:${section.color}">${section.icon}</span>
-          ${section.section}
-        </div>
-        <div class="conn-fields">
-          ${section.fields.map(f => `
-          <div>
-            <div class="conn-field-label">${f.label}</div>
-            <div class="conn-input-wrap">
-              <input class="conn-input${c[f.key] ? " filled" : ""}" id="cf-${pid}-${f.key}"
-                type="${f.type === "password" ? "password" : "text"}"
-                value="${c[f.key] || ""}" placeholder="${f.placeholder}"
-                autocomplete="off" spellcheck="false"
-                oninput="this.classList.toggle('filled',this.value.length>0)"/>
-              ${f.type === "password" ? `<button class="conn-eye" onclick="toggleConnEye('${pid}-${f.key}')">👁</button>` : ""}
-            </div>
-            <div class="conn-hint">💡 ${f.hint}</div>
-          </div>`).join("")}
-        </div>
-      </div>`).join("")}
-      <div class="conn-actions">
-        <button class="conn-save-btn" onclick="saveConn('${pid}')">Save Credentials</button>
-        <button class="conn-clear-btn" onclick="clearConn('${pid}')">Clear</button>
-        <span id="conn-saved-${pid}" class="conn-saved" style="display:none">✓ Saved</span>
-      </div>
-    </div>
-  </div>
+  ${!sbOk && !goOk ? `
+  <div style="padding:12px 20px;border-top:1px solid #2a3048;font-size:12px;color:#64748b">
+    No credentials saved for this project yet.
+    <span style="color:#6366f1;cursor:pointer;font-weight:600" onclick="navigate('settings')">
+      Add them in Account & Settings →
+    </span>
+  </div>` : ""}
 </div>`;
 }
 
-window.toggleConn = function(pid) {
-  const body  = document.getElementById(`conn-body-${pid}`);
-  const arrow = document.getElementById(`conn-arrow-${pid}`);
-  const open  = body.style.display === "none";
-  body.style.display  = open ? "block" : "none";
-  arrow.textContent   = open ? "▾" : "▸";
-};
+// Credentials are now managed in Account & Settings (user.js)
 
-window.toggleConnEye = function(fid) {
-  const inp = document.getElementById(`cf-${fid}`);
-  inp.type  = inp.type === "password" ? "text" : "password";
-};
 
-window.saveConn = function(pid) {
-  const keys  = ["supabase_url","supabase_anon_key","google_client_id","google_client_secret","google_redirect_uri"];
-  const creds = {};
-  keys.forEach(k => { const el = document.getElementById(`cf-${pid}-${k}`); if (el) creds[k] = el.value.trim(); });
-  saveProjectCreds(pid, creds);
-  const msg = document.getElementById(`conn-saved-${pid}`);
-  if (msg) { msg.style.display = "inline"; setTimeout(() => msg.style.display = "none", 2500); }
-  // Refresh status badges
-  const sbOk = !!(creds.supabase_url && creds.supabase_anon_key);
-  const goOk = !!(creds.google_client_id && creds.google_client_secret && creds.google_redirect_uri);
-  const panel = document.getElementById(`conn-panel-${pid}`);
-  if (panel) {
-    panel.querySelectorAll(".conn-badge").forEach((b, i) => {
-      if (i === 0) { b.className = `conn-badge ${sbOk ? "ok" : "miss"}`; b.textContent = `${sbOk ? "✓" : "○"} Supabase`; }
-      else         { b.className = `conn-badge ${goOk ? "ok" : "miss"}`; b.textContent = `${goOk ? "✓" : "○"} Google OAuth`; }
-    });
-  }
-};
-
-window.clearConn = function(pid) {
-  if (!confirm("Clear all credentials for this project?")) return;
-  localStorage.removeItem("proj_creds_" + pid);
-  ["supabase_url","supabase_anon_key","google_client_id","google_client_secret","google_redirect_uri"].forEach(k => {
-    const el = document.getElementById(`cf-${pid}-${k}`);
-    if (el) { el.value = ""; el.classList.remove("filled"); }
-  });
-};
 
 // ── Project Modal ─────────────────────────────────────────────
 window.openProjectModal = function(id) {

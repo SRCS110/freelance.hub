@@ -16,15 +16,11 @@
 
 <!--
   Load order matters:
-  1. config        — credentials
-  2. supabase      — db client
-  3. auth          — session helpers (needs supabase)
-  4. utils         — shared helpers
-  5. pages         — each page renderer
-  6. app           — router + boot (must be last)
+  1. auth   — config, db, session, OAuth (all-in-one)
+  2. utils  — shared helpers
+  3. pages  — each page renderer
+  4. app    — router + boot (must be last)
 -->
-<script src="config/config.js"></script>
-<script src="client/js/supabase.js"></script>
 <script src="client/js/auth.js"></script>
 <script src="client/js/utils.js"></script>
 <script src="client/pages/dashboard.js"></script>
@@ -33,6 +29,7 @@
 <script src="client/pages/finances.js"></script>
 <script src="client/pages/invoices.js"></script>
 <script src="client/pages/business-plan.js"></script>
+<script src="client/pages/user.js"></script>
 <script src="client/js/app.js"></script>
 
 </body>

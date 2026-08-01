@@ -3,14 +3,13 @@
 //  App state, render router, and boot sequence.
 // ============================================================
 
-// ── App State ─────────────────────────────────────────────────
 let STATE = {
   user:        null,
   page:        "dashboard",
   openProject: null,
-  data:        {
+  data: {
     clients: [], projects: [], finances: [], invoices: [],
-    business_plan: null,
+    business_plan: null, user_settings: null, project_credentials: [],
   },
   loading: true,
 };
@@ -19,19 +18,23 @@ let STATE = {
 async function loadAll() {
   if (!STATE.user) return;
   try {
-    const [clients, projects, finances, invoices, bpList] = await Promise.all([
+    const [clients, projects, finances, invoices, bpList, settingsList, projCreds] = await Promise.all([
       db.list("clients"),
       db.list("projects"),
       db.list("finances"),
       db.list("invoices"),
       db.list("business_plan").catch(() => []),
+      db.list("user_settings").catch(() => []),
+      db.list("project_credentials").catch(() => []),
     ]);
     STATE.data = {
-      clients:       clients  || [],
-      projects:      projects || [],
-      finances:      finances || [],
-      invoices:      invoices || [],
-      business_plan: (bpList || [])[0] || null,
+      clients:             clients  || [],
+      projects:            projects || [],
+      finances:            finances || [],
+      invoices:            invoices || [],
+      business_plan:       (bpList || [])[0] || null,
+      user_settings:       (settingsList || [])[0] || null,
+      project_credentials: projCreds || [],
     };
   } catch (e) {
     console.error("loadAll error:", e.message);
@@ -53,17 +56,19 @@ window.doSignOut   = function() { signOut(); window.location.href = "login.html"
 
 // ── Sidebar ───────────────────────────────────────────────────
 function sidebarHTML() {
-  const nav = [
-    { id: "dashboard",     label: "Dashboard",      icon: "⬡" },
-    { id: "clients",       label: "Clients",         icon: "👥" },
-    { id: "projects",      label: "Projects",        icon: "📁" },
-    { id: "finances",      label: "Finances",        icon: "💰" },
-    { id: "invoices",      label: "Invoices",        icon: "🧾" },
-    { id: "business-plan", label: "Business Plan",   icon: "📋" },
-  ];
+  const s   = STATE.data.user_settings;
+  const usr = STATE.user;
+  const displayName = s?.display_name || usr?.email?.split("@")[0] || "You";
+  const overdueCt   = STATE.data.invoices.filter(i => i.status === "Overdue").length;
 
-  // Badge for overdue invoices
-  const overdueCt = STATE.data.invoices.filter(i => i.status === "Overdue").length;
+  const nav = [
+    { id: "dashboard",     label: "Dashboard",    icon: "⬡" },
+    { id: "clients",       label: "Clients",       icon: "👥" },
+    { id: "projects",      label: "Projects",      icon: "📁" },
+    { id: "finances",      label: "Finances",      icon: "💰" },
+    { id: "invoices",      label: "Invoices",      icon: "🧾" },
+    { id: "business-plan", label: "Business Plan", icon: "📋" },
+  ];
 
   return `
 <div class="sidebar">
@@ -79,8 +84,14 @@ function sidebarHTML() {
       ? `<span style="margin-left:auto;background:#f43f5e;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px">${overdueCt}</span>`
       : ""}
   </div>`).join("")}
+
   <div class="sidebar-footer">
-    <div class="user-email">${STATE.user?.email || ""}</div>
+    <div class="nav-item${STATE.page === "settings" ? " active" : ""}"
+      onclick="navigate('settings')"
+      style="padding:8px 20px;margin-bottom:8px;border-radius:0">
+      <span style="font-size:16px;width:20px;text-align:center">⚙️</span>
+      ${displayName}
+    </div>
     <button class="logout-btn" onclick="doSignOut()">Sign Out</button>
   </div>
 </div>`;
@@ -103,6 +114,7 @@ function render() {
   else if (STATE.page === "finances")                          content = financesHTML();
   else if (STATE.page === "invoices")                          content = invoicesHTML();
   else if (STATE.page === "business-plan")                     content = businessPlanHTML();
+  else if (STATE.page === "settings")                          content = userSettingsHTML();
 
   root.innerHTML = sidebarHTML() + `<div class="main">${content}</div>`;
 }
@@ -112,7 +124,7 @@ function render() {
   if (!hasConfig()) { window.location.href = "login.html"; return; }
 
   const user = await restoreSession().catch(() => null);
-  if (!user) { window.location.href = "login.html"; return; }
+  if (!user)  { window.location.href = "login.html"; return; }
 
   STATE.user     = user;
   window.STATE   = STATE;
