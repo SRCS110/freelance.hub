@@ -311,10 +311,7 @@ window.sendPasswordReset = async function() {
   const email = STATE.user?.email;
   if (!email) return;
   try {
-    await sbFetch("/auth/v1/recover", {
-      method: "POST",
-      body: JSON.stringify({ email }),
-    });
+    await Auth.sendPasswordReset(email);
     const msg = document.getElementById("user-msg");
     msg.innerHTML = `<div class="msg-ok">✓ Reset email sent to ${email}.</div>`;
     msg.style.display = "block";
