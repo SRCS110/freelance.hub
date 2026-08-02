@@ -19,7 +19,7 @@ let STATE = {
 async function loadAll() {
   if (!STATE.user) return;
   try {
-    const [clients, projects, finances, invoices, bpList, settingsList, projCreds, bookmarks, techStack] = await Promise.all([
+    const [clients, projects, finances, invoices, bpList, settingsList, projCreds, bookmarks, techStack, wfTemplates, wfSteps, wfRuns, wfRunSteps] = await Promise.all([
       db.list("clients"),
       db.list("projects"),
       db.list("finances"),
