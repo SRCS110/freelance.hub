@@ -87,10 +87,38 @@ function _bookmarkCard(b) {
 </div>`;
 }
 
-window.toggleBmPw = function(id, pw) {
+// PIN-gated credential helpers
+window.bmShowPw = function(btn) {
+  const id = btn.dataset.id;
+  const pw = btn.dataset.pw;
   const el = document.getElementById("pw-" + id);
   if (!el) return;
-  el.textContent = el.textContent === "••••••••" ? pw : "••••••••";
+  if (el.textContent !== "••••••••") {
+    el.textContent = "••••••••";
+    el.style.letterSpacing = "2px";
+    btn.textContent = "show";
+    return;
+  }
+  requirePin(() => {
+    el.textContent = pw;
+    el.style.letterSpacing = "normal";
+    btn.textContent = "hide";
+    setTimeout(() => {
+      el.textContent = "••••••••";
+      el.style.letterSpacing = "2px";
+      btn.textContent = "show";
+    }, 30000);
+  });
+};
+
+window.bmCopy = function(btn) {
+  const val = btn.dataset.val;
+  requirePin(() => {
+    navigator.clipboard.writeText(val);
+    const orig = btn.textContent;
+    btn.textContent = "copied!";
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
 };
 
 window.setBmTag = function(t) { window._bmTag = t; render(); };

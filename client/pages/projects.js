@@ -233,4 +233,126 @@ window.deleteProject = async function(id) {
 };
 
 window.projectsListHTML = projectsListHTML;
+// ── Todo helpers ──────────────────────────────────────────────
+function _projectTodos(pid) {
+  return (STATE.data.project_todos || [])
+    .filter(t => t.project_id === pid)
+    .sort((a, b) => {
+      if (a.completed !== b.completed) return a.completed ? 1 : -1;
+      const pri = { high: 0, normal: 1, low: 2 };
+      return (pri[a.priority] || 1) - (pri[b.priority] || 1) || a.sort_order - b.sort_order;
+    });
+}
+
+const PRI_COLOR = { high: "var(--danger)", normal: "var(--text-muted)", low: "var(--border-2)" };
+const PRI_DOT   = { high: "◆", normal: "◇", low: "○" };
+
+function _todoListHTML(pid) {
+  const todos = _projectTodos(pid);
+  if (todos.length === 0) {
+    return `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);padding:8px 0">
+      no tasks yet — hit + add to create one.
+    </div>`;
+  }
+
+  const open   = todos.filter(t => !t.completed);
+  const closed = todos.filter(t => t.completed);
+
+  const renderItem = t => `
+  <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);opacity:${t.completed ? ".45" : "1"}" id="todo-row-${t.id}">
+    <button onclick="toggleTodo('${t.id}',${t.completed})"
+      style="width:18px;height:18px;flex-shrink:0;border-radius:3px;border:1.5px solid ${t.completed ? "var(--accent)" : "var(--border-2)"};
+             background:${t.completed ? "var(--accent)" : "transparent"};cursor:pointer;
+             display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;
+             color:var(--accent-fg);transition:all .15s">
+      ${t.completed ? "✓" : ""}
+    </button>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${PRI_COLOR[t.priority] || "var(--text-muted)"};flex-shrink:0">${PRI_DOT[t.priority] || "◇"}</span>
+    <span style="flex:1;font-size:13px;color:var(--text);${t.completed ? "text-decoration:line-through" : ""};font-family:'JetBrains Mono',monospace">${t.title}</span>
+    ${t.due_date ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${new Date(t.due_date) < new Date() && !t.completed ? "var(--danger)" : "var(--text-muted)"}">${fmtDate(t.due_date)}</span>` : ""}
+    <button onclick="deleteTodo('${t.id}')"
+      style="background:none;border:none;color:var(--border-2);font-size:14px;cursor:pointer;padding:0;line-height:1;flex-shrink:0"
+      onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--border-2)'">×</button>
+  </div>`;
+
+  return open.map(renderItem).join("") +
+    (closed.length > 0 ? `
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.6px;text-transform:uppercase;margin:12px 0 6px;opacity:.6">
+      completed (${closed.length})
+    </div>
+    ${closed.map(renderItem).join("")}` : "");
+}
+
+// Refresh just the todo list without full render
+function _refreshTodoList(pid) {
+  const el = document.getElementById("todo-list-" + pid);
+  if (el) el.innerHTML = _todoListHTML(pid);
+  // Update remaining count
+  const remaining = _projectTodos(pid).filter(t => !t.completed).length;
+  const countEl = el?.closest(".card")?.querySelector(".section-title span");
+  if (countEl) countEl.textContent = `${remaining} remaining`;
+}
+
+window.openTodoInput = function(pid) {
+  const wrap = document.getElementById("todo-input-" + pid);
+  if (!wrap) return;
+  wrap.style.display = "block";
+  setTimeout(() => document.getElementById("todo-text-" + pid)?.focus(), 50);
+};
+
+window.closeTodoInput = function(pid) {
+  const wrap = document.getElementById("todo-input-" + pid);
+  if (wrap) wrap.style.display = "none";
+  const inp = document.getElementById("todo-text-" + pid);
+  if (inp) inp.value = "";
+};
+
+window.saveTodo = async function(pid) {
+  const inp  = document.getElementById("todo-text-" + pid);
+  const pri  = document.getElementById("todo-pri-" + pid);
+  const due  = document.getElementById("todo-due-" + pid);
+  const title = inp?.value.trim();
+  if (!title) return;
+
+  const todos = _projectTodos(pid);
+  try {
+    await db.insert("project_todos", {
+      project_id: pid,
+      title,
+      priority:   pri?.value || "normal",
+      due_date:   due?.value || null,
+      sort_order: todos.length,
+      completed:  false,
+    });
+    await loadAll();
+    closeTodoInput(pid);
+  } catch(e) { alert(e.message); }
+};
+
+window.toggleTodo = async function(id, currentlyDone) {
+  try {
+    await db.update("project_todos", id, {
+      completed:    !currentlyDone,
+      completed_at: !currentlyDone ? new Date().toISOString() : null,
+    });
+    // Optimistic update in state
+    const todo = (STATE.data.project_todos || []).find(t => t.id === id);
+    if (todo) {
+      todo.completed    = !currentlyDone;
+      todo.completed_at = !currentlyDone ? new Date().toISOString() : null;
+    }
+    _refreshTodoList(STATE.openProject?.id);
+  } catch(e) { console.error(e); }
+};
+
+window.deleteTodo = async function(id) {
+  try {
+    await db.delete("project_todos", id);
+    if (STATE.data.project_todos) {
+      STATE.data.project_todos = STATE.data.project_todos.filter(t => t.id !== id);
+    }
+    _refreshTodoList(STATE.openProject?.id);
+  } catch(e) { console.error(e); }
+};
+
 window.projectFileHTML  = projectFileHTML;
