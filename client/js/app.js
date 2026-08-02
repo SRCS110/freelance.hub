@@ -52,7 +52,7 @@ function navigate(page) {
 
 window.navigate    = navigate;
 window.openProject = function(p) { STATE.openProject = p; STATE.page = "projects"; render(); };
-window.doSignOut   = function() { signOut(); window.location.href = "login.html"; };
+window.doSignOut   = function() { Auth.signOut(); };
 
 // ── Sidebar ───────────────────────────────────────────────────
 function sidebarHTML() {
@@ -120,16 +120,27 @@ function render() {
 }
 
 // ── Boot ──────────────────────────────────────────────────────
-(async function boot() {
+function waitForAuth(cb, tries = 0) {
+  if (window.Auth) { cb(); return; }
+  if (tries < 100) setTimeout(() => waitForAuth(cb, tries + 1), 50);
+  else { window.location.href = "login.html"; }
+}
+
+waitForAuth(async function() {
   if (!hasConfig()) { window.location.href = "login.html"; return; }
 
-  const user = await restoreSession().catch(() => null);
-  if (!user)  { window.location.href = "login.html"; return; }
+  const session = await Auth.requireAuth();
+  if (!session) return; // requireAuth redirects if no session
 
-  STATE.user     = user;
+  STATE.user     = session.user;
   window.STATE   = STATE;
   window.loadAll = loadAll;
   window.render  = render;
 
+  // Watch for sign-out from another tab
+  Auth.onAuthStateChange((event, s) => {
+    if (event === "SIGNED_OUT") window.location.href = "login.html";
+  });
+
   await loadAll();
-})();
+});
