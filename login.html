@@ -4,131 +4,382 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>FreelanceHub — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="client/css/styles.css"/>
-<style>body { overflow: auto; background: #fff; }</style>
+
+<!-- Supabase JS v2 — must load synchronously before auth.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="client/js/auth.js"></script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #0f1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(99,102,241,0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+.login-card {
+  background: #1a1f2e;
+  border: 1px solid #2a3048;
+  border-radius: 16px;
+  padding: 44px 40px 36px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  position: relative;
+  z-index: 1;
+}
+.logo-wrap { display: flex; justify-content: center; margin-bottom: 22px; }
+.logo-mark {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px; font-weight: 700; color: #fff;
+}
+.login-card h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.55rem; font-weight: 700;
+  margin: 0 0 6px; text-align: center;
+  color: #fff; letter-spacing: -0.02em;
+}
+.login-card .sub {
+  color: #64748b; font-size: 0.86rem;
+  text-align: center; margin: 0 0 28px; line-height: 1.5;
+}
+.mode-tabs {
+  display: flex;
+  border: 1px solid #2a3048;
+  border-radius: 8px; padding: 3px; gap: 3px;
+  margin-bottom: 22px; background: #0f1117;
+}
+.mode-tab {
+  flex: 1; padding: 8px;
+  font-size: 0.82rem; font-weight: 600;
+  border: none; background: transparent;
+  border-radius: 6px; cursor: pointer;
+  color: #64748b;
+  transition: background .15s, color .15s;
+  font-family: 'Inter', sans-serif;
+}
+.mode-tab.active { background: #1a1f2e; color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+.field { margin-bottom: 14px; }
+.field label {
+  display: block; font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: #64748b; font-weight: 600; margin-bottom: 6px;
+}
+.field input {
+  width: 100%; padding: 11px 13px;
+  border: 1.5px solid #2a3048; border-radius: 8px;
+  font-size: 0.95rem; font-family: 'Inter', sans-serif;
+  background: #0f1117; color: #e2e8f0;
+  transition: border-color .15s;
+}
+.field input:focus { outline: none; border-color: #6366f1; background: #0f1117; }
+.field input::placeholder { color: #475569; }
+.btn {
+  width: 100%; padding: 12px;
+  font-size: 0.92rem; font-weight: 600;
+  border: none; border-radius: 8px; cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: opacity .15s, transform .1s;
+  display: flex; align-items: center; justify-content: center;
+  gap: 9px; margin-bottom: 10px;
+}
+.btn:hover { opacity: 0.88; }
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; }
+.btn-google  { background: #fff; color: #1e293b; border: 1.5px solid #e2e8f0; }
+.btn-google:hover { background: #f8fafc; opacity: 1; }
+.divider {
+  display: flex; align-items: center;
+  gap: 12px; margin: 16px 0;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: #2a3048;
+}
+.divider span { font-size: 0.75rem; color: #475569; white-space: nowrap; font-weight: 500; }
+.msg {
+  font-size: 0.8rem; min-height: 1.1em;
+  margin-top: 12px; text-align: center;
+  line-height: 1.5; padding: 8px 12px;
+  border-radius: 6px; display: none;
+}
+.msg.error   { color: #f43f5e; background: #f43f5e11; border: 1px solid #f43f5e33; display: block; }
+.msg.success { color: #10b981; background: #10b98111; border: 1px solid #10b98133; display: block; }
+.msg.info    { color: #64748b; background: #64748b11; border: 1px solid #2a3048;   display: block; }
+.auth-footer { margin-top: 16px; text-align: center; }
+.auth-footer button {
+  background: none; border: none; padding: 0;
+  font-size: 0.82rem; color: #6366f1; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-weight: 500;
+}
+.auth-footer button:hover { text-decoration: underline; }
+.btn .spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin .7s linear infinite; display: none;
+}
+.btn-google .spinner { border-color: rgba(0,0,0,0.1); border-top-color: #1e293b; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn.loading .spinner   { display: block; }
+.btn.loading .btn-label { display: none; }
+#resetPanel { display: none; }
+.brand-foot {
+  position: fixed; bottom: 18px; left: 0; right: 0;
+  text-align: center; font-size: 0.7rem;
+  color: rgba(255,255,255,0.15); pointer-events: none;
+}
+</style>
 </head>
 <body>
-<canvas id="swirl-canvas"></canvas>
 
-<div id="auth-screen">
-  <div class="auth-wrap" style="position:relative;z-index:1">
-    <div class="auth-card">
-      <div class="auth-logo">FreelanceHub</div>
-      <div class="auth-tagline">Your all-in-one business command center</div>
+<div class="login-card">
+  <div class="logo-wrap">
+    <div class="logo-mark">F</div>
+  </div>
+  <h1>FreelanceHub</h1>
+  <p class="sub">Your all-in-one business command center</p>
 
-      <div id="auth-error"   class="msg-error" style="display:none"></div>
-      <div id="auth-success" class="msg-ok"    style="display:none"></div>
+  <div class="mode-tabs" id="modeTabs">
+    <button class="mode-tab active" data-mode="signin">Sign in</button>
+    <button class="mode-tab" data-mode="signup">Create account</button>
+  </div>
 
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input id="auth-email" type="email" placeholder="you@example.com"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Password</label>
-        <input id="auth-pw" type="password" placeholder="••••••••"/>
-      </div>
-
-      <button class="btn btn-primary" id="auth-btn" onclick="handleAuth()">Sign In</button>
-
-      <div style="display:block;margin-top:12px">
-        <button class="btn" id="google-btn" onclick="googleOAuth.login()"
-          style="width:100%;padding:11px;background:#fff;color:#1e293b;border:1px solid #e2e8f0;
-                 display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;
-                 border-radius:10px;box-shadow:0 1px 4px #0001">
-          <svg width="18" height="18" viewBox="0 0 48 48">
-            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-          </svg>
-          Continue with Google
-        </button>
-      </div>
-
-      <div class="auth-toggle" id="auth-toggle">
-        No account? <span class="auth-link" onclick="setMode('signup')">Create one</span>
-      </div>
+  <div id="emailPanel">
+    <div class="field">
+      <label for="emailInput">Email address</label>
+      <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <div class="field" id="nameFieldWrap" style="display:none">
+      <label for="nameInput">Full name</label>
+      <input type="text" id="nameInput" placeholder="Jane Smith" autocomplete="name"/>
+    </div>
+    <div class="field">
+      <label for="passwordInput">Password</label>
+      <input type="password" id="passwordInput" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="btn btn-primary" id="emailBtn">
+      <span class="btn-label">Sign in</span>
+      <span class="spinner"></span>
+    </button>
+    <div class="auth-footer" id="signInFooter">
+      <button id="forgotBtn">Forgot password?</button>
     </div>
   </div>
+
+  <div class="divider"><span>or</span></div>
+
+  <button class="btn btn-google" id="googleBtn">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908C16.658 12.075 17.64 9.767 17.64 9.2Z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z" fill="#34A853"/>
+      <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z" fill="#FBBC05"/>
+      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z" fill="#EA4335"/>
+    </svg>
+    <span class="btn-label">Continue with Google</span>
+    <span class="spinner"></span>
+  </button>
+
+  <div id="resetPanel">
+    <div class="field">
+      <label for="resetEmail">Email address</label>
+      <input type="email" id="resetEmail" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <button class="btn btn-primary" id="resetBtn">
+      <span class="btn-label">Send reset link</span>
+      <span class="spinner"></span>
+    </button>
+    <div class="auth-footer" style="margin-top:14px">
+      <button id="backToSignin">← Back to sign in</button>
+    </div>
+  </div>
+
+  <div class="msg" id="authMsg"></div>
 </div>
 
-<script src="client/js/auth.js"></script>
-<script src="client/js/utils.js"></script>
+<div class="brand-foot">freelance.srcs.online</div>
+
 <script>
-  let _mode = "login";
+function waitForAuth(cb, tries = 0) {
+  if (window.Auth) { cb(); return; }
+  if (tries < 100) setTimeout(() => waitForAuth(cb, tries + 1), 50);
+  else console.error('[login] auth.js never loaded');
+}
 
-  function setMode(m) {
-    _mode = m;
-    document.getElementById("auth-btn").textContent  = m === "signup" ? "Create Account" : "Sign In";
-    document.getElementById("auth-toggle").innerHTML = m === "login"
-      ? `No account? <span class="auth-link" onclick="setMode('signup')">Create one</span>`
-      : `Have an account? <span class="auth-link" onclick="setMode('login')">Sign in</span>`;
-    clearMessages();
-  }
+waitForAuth(function() {
 
-  function showError(msg)   { const el = document.getElementById("auth-error");   el.textContent = msg; el.style.display = "block"; }
-  function showSuccess(msg) { const el = document.getElementById("auth-success"); el.textContent = msg; el.style.display = "block"; }
-  function clearMessages()  {
-    document.getElementById("auth-error").style.display   = "none";
-    document.getElementById("auth-success").style.display = "none";
-  }
-
-  window.handleAuth = async function() {
-    const email = document.getElementById("auth-email").value.trim();
-    const pw    = document.getElementById("auth-pw").value;
-    if (!email || !pw) return;
-    clearMessages();
-    const btn = document.getElementById("auth-btn");
-    btn.textContent = "Please wait…"; btn.disabled = true;
+  /* ── If already signed in, skip to dashboard ── */
+  (async () => {
     try {
-      if (_mode === "signup") {
-        await signUp(email, pw);
-        showSuccess("Account created! Sign in below.");
-        setMode("login");
+      const session = await Auth.getSession();
+      if (session) { location.href = 'index.html'; }
+    } catch(e) {}
+  })();
+
+  /* ── Password reset redirect ── */
+  if (new URLSearchParams(location.search).get('mode') === 'reset') showResetConfirmMode();
+
+  /* ── Mode tabs ── */
+  let currentMode = 'signin';
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      currentMode = tab.dataset.mode;
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t === tab));
+      document.getElementById('nameFieldWrap').style.display   = currentMode === 'signup' ? 'block' : 'none';
+      document.getElementById('signInFooter').style.display    = currentMode === 'signin' ? 'block' : 'none';
+      document.getElementById('emailBtn').querySelector('.btn-label').textContent = currentMode === 'signup' ? 'Create account' : 'Sign in';
+      document.getElementById('passwordInput').autocomplete    = currentMode === 'signup' ? 'new-password' : 'current-password';
+      clearMsg();
+    });
+  });
+
+  /* ── Email / password submit ── */
+  document.getElementById('emailBtn').addEventListener('click', handleEmailAuth);
+  document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleEmailAuth(); });
+
+  async function handleEmailAuth() {
+    const email    = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    const name     = document.getElementById('nameInput').value.trim();
+    if (!email)    return showMsg('Please enter your email address.', 'error');
+    if (!password) return showMsg('Please enter your password.', 'error');
+    if (currentMode === 'signup' && password.length < 8)
+      return showMsg('Password must be at least 8 characters.', 'error');
+    setLoading('emailBtn', true); clearMsg();
+    try {
+      if (currentMode === 'signin') {
+        await Auth.signInWithEmail(email, password);
+        location.href = 'index.html';
       } else {
-        const data = await signIn(email, pw);
-        if (data?.user) {
-          window.location.href = "index.html";
+        const { user } = await Auth.signUpWithEmail(email, password, { full_name: name });
+        if (user && !user.identities?.length) {
+          showMsg('An account with this email already exists. Try signing in.', 'error');
         } else {
-          throw new Error("Sign in failed.");
+          showMsg('Account created! Check your email to confirm, then sign in.', 'success');
+          document.querySelector('[data-mode="signin"]').click();
         }
       }
-    } catch(e) {
-      showError(e.message || "Something went wrong.");
+    } catch(err) {
+      showMsg(friendlyError(err.message), 'error');
+    } finally {
+      setLoading('emailBtn', false);
     }
-    btn.textContent = _mode === "signup" ? "Create Account" : "Sign In";
-    btn.disabled = false;
-  };
-
-  async function boot() {
-    // If not configured yet, show a clear message instead of a broken screen
-    if (!hasConfig()) {
-      document.getElementById("auth-error").textContent =
-        "Supabase URL and anon key not set. Open client/js/auth.js and fill in SUPABASE_URL and SUPABASE_ANON_KEY.";
-      document.getElementById("auth-error").style.display = "block";
-      document.getElementById("auth-btn").disabled = true;
-      document.getElementById("google-btn").disabled = true;
-      startSwirl();
-      return;
-    }
-
-    const user = await restoreSession().catch(() => null);
-    if (user) { window.location.href = "index.html"; return; }
-
-    startSwirl();
-
-    // Handle Google OAuth callback
-    if (window.location.hash.includes("access_token")) {
-      const token = googleOAuth.handleCallback();
-      if (token) { window.location.href = "index.html"; return; }
-    }
-
-    document.getElementById("auth-email").addEventListener("keydown", e => { if(e.key==="Enter") handleAuth(); });
-    document.getElementById("auth-pw").addEventListener("keydown",    e => { if(e.key==="Enter") handleAuth(); });
   }
 
-  boot();
+  /* ── Google OAuth — NOT async (popup blocker fix) ── */
+  document.getElementById('googleBtn').addEventListener('click', () => {
+    setLoading('googleBtn', true); clearMsg();
+    Auth.signInWithGoogle().catch(err => {
+      showMsg(friendlyError(err.message), 'error');
+      setLoading('googleBtn', false);
+    });
+  });
+
+  /* ── Forgot password ── */
+  document.getElementById('forgotBtn').addEventListener('click', () => {
+    document.getElementById('modeTabs').style.display   = 'none';
+    document.getElementById('emailPanel').style.display = 'none';
+    document.querySelector('.divider').style.display    = 'none';
+    document.getElementById('googleBtn').style.display  = 'none';
+    document.getElementById('resetPanel').style.display = 'block';
+    clearMsg();
+  });
+  document.getElementById('backToSignin').addEventListener('click', () => {
+    document.getElementById('modeTabs').style.display   = 'flex';
+    document.getElementById('emailPanel').style.display = 'block';
+    document.querySelector('.divider').style.display    = 'flex';
+    document.getElementById('googleBtn').style.display  = 'flex';
+    document.getElementById('resetPanel').style.display = 'none';
+    clearMsg();
+  });
+  document.getElementById('resetBtn').addEventListener('click', async () => {
+    const email = document.getElementById('resetEmail').value.trim();
+    if (!email) return showMsg('Please enter your email address.', 'error');
+    setLoading('resetBtn', true); clearMsg();
+    try {
+      await Auth.sendPasswordReset(email);
+      showMsg('Reset link sent — check your inbox (and spam folder).', 'success');
+    } catch(err) {
+      showMsg(friendlyError(err.message), 'error');
+    } finally {
+      setLoading('resetBtn', false);
+    }
+  });
+
+  /* ── Password update after reset link ── */
+  function showResetConfirmMode() {
+    document.getElementById('modeTabs').style.display   = 'none';
+    document.querySelector('.sub').textContent          = 'Choose a new password';
+    document.getElementById('emailPanel').style.display = 'none';
+    document.querySelector('.divider').style.display    = 'none';
+    document.getElementById('googleBtn').style.display  = 'none';
+    const panel = document.getElementById('resetPanel');
+    panel.innerHTML = `
+      <div class="field">
+        <label for="newPw">New password</label>
+        <input type="password" id="newPw" placeholder="Min. 8 characters" autocomplete="new-password"/>
+      </div>
+      <button class="btn btn-primary" id="updatePwBtn">
+        <span class="btn-label">Update password</span>
+        <span class="spinner"></span>
+      </button>`;
+    panel.style.display = 'block';
+    document.getElementById('updatePwBtn').addEventListener('click', async () => {
+      const pw = document.getElementById('newPw').value;
+      if (pw.length < 8) return showMsg('Password must be at least 8 characters.', 'error');
+      setLoading('updatePwBtn', true);
+      try {
+        await Auth.updatePassword(pw);
+        showMsg('Password updated — redirecting…', 'success');
+        setTimeout(() => location.href = 'index.html', 1800);
+      } catch(err) {
+        showMsg(friendlyError(err.message), 'error');
+        setLoading('updatePwBtn', false);
+      }
+    });
+  }
+
+  /* ── Helpers ── */
+  function showMsg(text, type = 'info') {
+    const el = document.getElementById('authMsg');
+    el.textContent = text; el.className = `msg ${type}`;
+  }
+  function clearMsg() {
+    const el = document.getElementById('authMsg');
+    el.className = 'msg'; el.textContent = '';
+  }
+  function setLoading(btnId, loading) {
+    document.getElementById(btnId)?.classList.toggle('loading', loading);
+  }
+  function friendlyError(msg = '') {
+    if (/invalid.*(login|credentials)/i.test(msg)) return 'Incorrect email or password.';
+    if (/email.*not.*confirmed/i.test(msg))         return 'Please confirm your email before signing in.';
+    if (/already.*registered/i.test(msg))           return 'An account with this email already exists.';
+    if (/password.*short/i.test(msg))               return 'Password must be at least 8 characters.';
+    if (/rate.?limit/i.test(msg))                   return 'Too many attempts — please wait a moment.';
+    if (/network/i.test(msg))                       return 'Network error — check your connection.';
+    return msg || 'Something went wrong. Please try again.';
+  }
+
+}); // end waitForAuth
 </script>
 </body>
 </html>

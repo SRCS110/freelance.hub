@@ -21,6 +21,8 @@
   3. pages  — each page renderer
   4. app    — router + boot (must be last)
 -->
+<!-- Supabase JS v2 — must load synchronously before auth.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="client/js/auth.js"></script>
 <script src="client/js/utils.js"></script>
 <script src="client/pages/dashboard.js"></script>
