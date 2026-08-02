@@ -19,7 +19,7 @@ let STATE = {
 async function loadAll() {
   if (!STATE.user) return;
   try {
-    const [clients, projects, finances, invoices, bpList, settingsList, projCreds, bookmarks, techStack, wfTemplates, wfSteps, wfRuns, wfRunSteps] = await Promise.all([
+    const [clients, projects, finances, invoices, bpList, settingsList, projCreds, bookmarks, techStack, wfTemplates, wfSteps, wfRuns, wfRunSteps, projectTodos] = await Promise.all([
       db.list("clients"),
       db.list("projects"),
       db.list("finances"),
@@ -33,6 +33,7 @@ async function loadAll() {
       db.list("workflow_steps").catch(() => []),
       db.list("workflow_runs").catch(() => []),
       db.list("workflow_run_steps").catch(() => []),
+      db.list("project_todos").catch(() => []),
     ]);
     STATE.data = {
       clients:             clients    || [],
@@ -48,6 +49,7 @@ async function loadAll() {
       workflow_steps:     wfSteps      || [],
       workflow_runs:      wfRuns       || [],
       workflow_run_steps: wfRunSteps   || [],
+      project_todos:      projectTodos || [],
     };
   } catch (e) {
     console.error("loadAll error:", e.message);
