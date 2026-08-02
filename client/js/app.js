@@ -119,6 +119,96 @@ function sidebarHTML() {
 </div>`;
 }
 
+
+// ── Mobile bar + drawer ───────────────────────────────────────
+function mobileBarHTML() {
+  return `
+<div class="mobile-bar">
+  <div class="mobile-bar-logo">FreelanceHub</div>
+  <button class="hamburger" id="hamburger-btn" onclick="toggleDrawer()">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<div class="mobile-drawer" id="mobile-drawer" onclick="closeDrawerOnBackdrop(event)">
+  <div class="mobile-drawer-backdrop"></div>
+  <div class="mobile-drawer-panel">
+    ${_drawerNav()}
+  </div>
+</div>`;
+}
+
+function _drawerNav() {
+  const nav = [
+    { id: "dashboard",     label: "Dashboard",    icon: "◈" },
+    { id: "clients",       label: "Clients",       icon: "◎" },
+    { id: "projects",      label: "Projects",      icon: "◫" },
+    { id: "finances",      label: "Finances",      icon: "◇" },
+    { id: "invoices",      label: "Invoices",      icon: "◻" },
+    { id: "business-plan", label: "Business Plan", icon: "◈" },
+    { id: "bookmarks",     label: "Bookmarks",     icon: "◆" },
+    { id: "tech-stack",    label: "Tech Stack",    icon: "◉" },
+    { id: "workflows",     label: "Workflows",     icon: "◳" },
+  ];
+  const overdueCt = STATE.data.invoices.filter(i => i.status === "Overdue").length;
+  const s   = STATE.data.user_settings;
+  const usr = STATE.user;
+  const displayName = s?.display_name || usr?.email?.split("@")[0] || "account";
+  const isLight = document.body.classList.contains("light");
+
+  return nav.map(n => `
+  <div class="nav-item${STATE.page === n.id ? " active" : ""}" onclick="drawerNavigate('${n.id}')">
+    <span style="font-family:'JetBrains Mono',monospace;width:20px;text-align:center;font-size:13px">${n.icon}</span>
+    ${n.label}
+    ${n.id === "invoices" && overdueCt > 0
+      ? `<span style="margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px">${overdueCt}</span>`
+      : ""}
+  </div>`).join("") + `
+  <div style="margin-top:auto;padding:16px 20px;border-top:1px solid var(--border)">
+    <div class="theme-toggle" onclick="toggleTheme()" style="margin-bottom:10px">
+      <span>${isLight ? "light" : "dark"} mode</span>
+      <div class="theme-toggle-track${isLight ? " on" : ""}">
+        <div class="theme-toggle-thumb"></div>
+      </div>
+    </div>
+    <div class="nav-item${STATE.page === "settings" ? " active" : ""}"
+      onclick="drawerNavigate('settings')"
+      style="padding:8px 0;margin-bottom:6px">
+      <span style="font-family:'JetBrains Mono',monospace;width:20px;text-align:center;font-size:13px">◈</span>
+      ${displayName}
+    </div>
+    <button class="logout-btn" onclick="doSignOut()">sign out</button>
+  </div>`;
+}
+
+window.toggleDrawer = function() {
+  const drawer = document.getElementById("mobile-drawer");
+  const btn    = document.getElementById("hamburger-btn");
+  if (!drawer) return;
+  const isOpen = drawer.classList.contains("open");
+  drawer.classList.toggle("open", !isOpen);
+  if (btn) btn.classList.toggle("open", !isOpen);
+};
+
+window.closeDrawerOnBackdrop = function(e) {
+  if (e.target.classList.contains("mobile-drawer-backdrop") ||
+      e.target.classList.contains("mobile-drawer")) {
+    closeDrawer();
+  }
+};
+
+window.closeDrawer = function() {
+  const drawer = document.getElementById("mobile-drawer");
+  const btn    = document.getElementById("hamburger-btn");
+  if (drawer) drawer.classList.remove("open");
+  if (btn)    btn.classList.remove("open");
+};
+
+window.drawerNavigate = function(page) {
+  closeDrawer();
+  navigate(page);
+};
+
 // ── Render router ─────────────────────────────────────────────
 function render() {
   const root = document.getElementById("app");
@@ -141,7 +231,7 @@ function render() {
   else if (STATE.page === "tech-stack")                        content = techStackHTML();
   else if (STATE.page === "workflows")                          content = workflowsHTML();
 
-  root.innerHTML = sidebarHTML() + `<div class="main">${content}</div>`;
+  root.innerHTML = sidebarHTML() + mobileBarHTML() + `<div class="main">${content}</div>`;
 }
 
 // ── Theme ─────────────────────────────────────────────────────
