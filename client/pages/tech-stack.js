@@ -66,7 +66,7 @@ ${stack.length === 0
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         <button class="btn btn-ghost btn-sm" onclick="openStackModal('${s.id}')" style="font-size:10px;padding:4px 8px">edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteStack('${s.id}')" style="font-size:10px;padding:4px 8px">✕</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteStack('${s.id}')" style="font-size:10px;padding:4px 8px">×</button>
       </div>
     </div>`).join("")}
   </div>

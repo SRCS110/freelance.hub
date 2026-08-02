@@ -88,7 +88,7 @@ function _templateCardHTML(t) {
       <button class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px"
         onclick="event.stopPropagation();openWfTemplateModal('${t.id}')">edit</button>
       <button class="btn btn-danger btn-sm" style="font-size:10px;padding:3px 8px"
-        onclick="event.stopPropagation();deleteWfTemplate('${t.id}')">✕</button>
+        onclick="event.stopPropagation();deleteWfTemplate('${t.id}')">×</button>
     </div>
   </div>
   ${t.description ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#808b9e;margin-bottom:10px;line-height:1.5">${t.description}</div>` : ""}
@@ -122,7 +122,7 @@ function _runCardHTML(r, dimmed = false) {
       ${!dimmed ? `<button class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px;color:#10b981;border-color:#10b98133"
         onclick="event.stopPropagation();completeWfRun('${r.id}')">✓ done</button>` : ""}
       <button class="btn btn-danger btn-sm" style="font-size:10px;padding:3px 8px"
-        onclick="event.stopPropagation();deleteWfRun('${r.id}')">✕</button>
+        onclick="event.stopPropagation();deleteWfRun('${r.id}')">×</button>
     </div>
   </div>
   ${total > 0 ? `
@@ -176,7 +176,7 @@ function _templateDetailHTML() {
     </div>
     <div style="display:flex;gap:6px;flex-shrink:0">
       <button class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px" onclick="openStepModal('${t.id}','${s.id}')">edit</button>
-      <button class="btn btn-danger btn-sm" style="font-size:10px;padding:3px 8px" onclick="deleteStep('${s.id}')">✕</button>
+      <button class="btn btn-danger btn-sm" style="font-size:10px;padding:3px 8px" onclick="deleteStep('${s.id}')">×</button>
     </div>
   </div>`).join("")}
   <button class="btn btn-ghost" style="margin-top:6px;width:100%;border-style:dashed;font-size:12px" onclick="openStepModal('${t.id}',null)">+ add step</button>

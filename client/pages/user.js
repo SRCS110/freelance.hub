@@ -49,7 +49,7 @@ function userSettingsHTML() {
 <!-- ── Profile ─────────────────────────────────────────────── -->
 <div class="card" style="margin-bottom:20px">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #2a3048">
-    <span style="font-size:20px">👤</span>
+    <span style="font-size:20px">◎</span>
     <div class="section-title" style="color:#6366f1">Profile</div>
   </div>
 
@@ -73,7 +73,7 @@ function userSettingsHTML() {
 <!-- ── Preferences ────────────────────────────────────────── -->
 <div class="card" style="margin-bottom:20px">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #2a3048">
-    <span style="font-size:20px">⚙️</span>
+    <span style="font-size:20px">◳</span>
     <div class="section-title" style="color:#10b981">Preferences</div>
   </div>
 
@@ -122,7 +122,7 @@ function userSettingsHTML() {
 <!-- ── Project Credentials ─────────────────────────────────── -->
 <div class="card" style="margin-bottom:20px">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;padding-bottom:14px;border-bottom:1px solid #2a3048">
-    <span style="font-size:20px">🔌</span>
+    <span style="font-size:20px">◉</span>
     <div>
       <div class="section-title" style="color:#f59e0b">Project Credentials</div>
       <div style="font-size:12px;color:#64748b;margin-top:2px">
@@ -142,7 +142,7 @@ function userSettingsHTML() {
 <!-- ── Security ───────────────────────────────────────────── -->
 <div class="card" style="margin-bottom:20px">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #2a3048">
-    <span style="font-size:20px">🔒</span>
+    <span style="font-size:20px">◆</span>
     <div class="section-title" style="color:#f43f5e">Security</div>
   </div>
 
@@ -226,7 +226,7 @@ function _projectCredBlock(p) {
   <div style="display:flex;gap:8px;align-items:center">
     <button class="conn-save-btn" onclick="saveProjCreds('${p.id}')">Save</button>
     <button class="conn-clear-btn" onclick="clearProjCreds('${p.id}')">Clear</button>
-    <span id="pc-saved-${p.id}" style="display:none;font-size:12px;color:#10b981">✓ Saved</span>
+    <span id="pc-saved-${p.id}" style="display:none;font-size:12px;color:#10b981">saved</span>
   </div>
 </div>`;
 }
@@ -255,7 +255,7 @@ window.saveUserSettings = async function() {
       await db.insert("user_settings", body);
     }
 
-    msg.innerHTML = `<div class="msg-ok">✓ Settings saved.</div>`;
+    msg.innerHTML = `<div class="msg-ok">settings saved.</div>`;
     msg.style.display = "block";
     setTimeout(() => { msg.style.display = "none"; }, 3000);
     await loadAll();
@@ -313,7 +313,7 @@ window.sendPasswordReset = async function() {
   try {
     await Auth.sendPasswordReset(email);
     const msg = document.getElementById("user-msg");
-    msg.innerHTML = `<div class="msg-ok">✓ Reset email sent to ${email}.</div>`;
+    msg.innerHTML = `<div class="msg-ok">reset email sent to ${email}.</div>`;
     msg.style.display = "block";
     setTimeout(() => { msg.style.display = "none"; }, 5000);
   } catch(e) {

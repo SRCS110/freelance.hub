@@ -53,7 +53,7 @@ function invoicesHTML() {
             ${inv.status === "Draft" ? `<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="updateInvStatus('${inv.id}','Sent')">Send</button>` : ""}
             ${inv.status !== "Void" && inv.status !== "Paid" ? `<button class="btn btn-ghost btn-sm" style="font-size:11px;color:#f59e0b;border-color:#f59e0b44" onclick="updateInvStatus('${inv.id}','Void')">Void</button>` : ""}
             <button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="openInvModal('${inv.id}')">Edit</button>
-            <button class="btn btn-danger btn-sm" style="font-size:11px" onclick="deleteInv('${inv.id}')">✕</button>
+            <button class="btn btn-danger btn-sm" style="font-size:11px" onclick="deleteInv('${inv.id}')">×</button>
           </div></td>
         </tr>`).join("")}</tbody>
       </table>`}

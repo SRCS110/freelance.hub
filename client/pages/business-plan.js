@@ -9,7 +9,7 @@ function businessPlanHTML() {
 
   const sections = [
     {
-      title: "Identity", icon: "🏢", color: "#6366f1",
+      title: "Identity", icon: "◈", color: "#6366f1",
       fields: [
         { key: "business_name", label: "Business Name",   placeholder: "Acme Freelance Co." },
         { key: "tagline",       label: "Tagline / Slogan", placeholder: "Making the web beautiful, one pixel at a time." },
@@ -18,7 +18,7 @@ function businessPlanHTML() {
       ],
     },
     {
-      title: "Market", icon: "🎯", color: "#10b981",
+      title: "Market", icon: "◉", color: "#10b981",
       fields: [
         { key: "target_market", label: "Target Market",         placeholder: "Small SaaS companies, 10-50 employees…", rows: 3 },
         { key: "value_prop",    label: "Value Proposition",     placeholder: "We help X do Y so they can Z…", rows: 3 },
@@ -26,14 +26,14 @@ function businessPlanHTML() {
       ],
     },
     {
-      title: "Business Model", icon: "💼", color: "#f59e0b",
+      title: "Business Model", icon: "◫", color: "#f59e0b",
       fields: [
         { key: "revenue_model", label: "Revenue Model",    placeholder: "Project-based, monthly retainer, hourly…", rows: 3 },
         { key: "marketing",     label: "Marketing Strategy", placeholder: "LinkedIn, referrals, cold email, SEO…", rows: 3 },
       ],
     },
     {
-      title: "Goals", icon: "🚀", color: "#38bdf8",
+      title: "Goals", icon: "▲", color: "#38bdf8",
       fields: [
         { key: "goals_90_day", label: "90-Day Goals",  placeholder: "Land 3 new clients, hit $10k MRR…", rows: 3 },
         { key: "goals_1_year", label: "1-Year Goals",  placeholder: "Expand to 2 full-time employees…", rows: 3 },
@@ -41,7 +41,7 @@ function businessPlanHTML() {
       ],
     },
     {
-      title: "SWOT Analysis", icon: "📊", color: "#8b5cf6",
+      title: "SWOT Analysis", icon: "◈", color: "#8b5cf6",
       swot: true,
       fields: [
         { key: "strengths",     label: "Strengths",     placeholder: "Deep technical expertise, fast delivery…", rows: 3, swotColor: "#10b981" },
@@ -51,7 +51,7 @@ function businessPlanHTML() {
       ],
     },
     {
-      title: "Notes", icon: "📝", color: "#64748b",
+      title: "Notes", icon: "◻", color: "#64748b",
       fields: [
         { key: "notes", label: "Additional Notes", placeholder: "Anything else worth memorializing…", rows: 5 },
       ],
@@ -69,7 +69,7 @@ function businessPlanHTML() {
     <div class="page-sub">Memorialize your strategy — ${updatedAt}</div>
   </div>
   <div class="btn-row">
-    <button class="btn btn-ghost" onclick="exportBP()">⬇ Export</button>
+    <button class="btn btn-ghost" onclick="exportBP()">export</button>
     <button class="btn btn-primary" id="bp-save-btn" onclick="saveBP()">Save Plan</button>
   </div>
 </div>
@@ -135,7 +135,7 @@ window.saveBP = async function() {
     } else {
       await db.insert("business_plan", body);
     }
-    msg.innerHTML = `<div class="msg-ok">✓ Business plan saved.</div>`;
+    msg.innerHTML = `<div class="msg-ok">plan saved.</div>`;
     msg.style.display = "block";
     setTimeout(() => { msg.style.display = "none"; }, 3000);
     await loadAll();

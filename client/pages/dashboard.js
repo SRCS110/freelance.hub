@@ -43,10 +43,10 @@ function dashboardHTML() {
   const overdue = invoices.filter(i => i.status === "Overdue").length;
 
   const stats = [
-    { label: "Revenue",         val: usd(rev),  icon: "💵", color: "#10b981", sub: DASH_PERIODS[period] },
-    { label: "Expenses",        val: usd(exp),  icon: "📊", color: "#f59e0b", sub: DASH_PERIODS[period] },
-    { label: "Outstanding",     val: usd(unpd), icon: "🧾", color: "#f43f5e", sub: `${invoices.filter(i => i.status !== "Paid" && i.status !== "Void").length} unpaid` },
-    { label: "Active Projects", val: actv,      icon: "📁", color: "#6366f1", sub: `${projects.length} total` },
+    { label: "Revenue",         val: usd(rev),  icon: "◇", color: "#10b981", sub: DASH_PERIODS[period] },
+    { label: "Expenses",        val: usd(exp),  icon: "◈", color: "#f59e0b", sub: DASH_PERIODS[period] },
+    { label: "Outstanding",     val: usd(unpd), icon: "◻", color: "#f43f5e", sub: `${invoices.filter(i => i.status !== "Paid" && i.status !== "Void").length} unpaid` },
+    { label: "Active Projects", val: actv,      icon: "◫", color: "#6366f1", sub: `${projects.length} total` },
   ];
 
   return `
@@ -64,15 +64,15 @@ function dashboardHTML() {
 
 ${overdue > 0 ? `
 <div style="margin-bottom:20px;padding:10px 16px;background:#f43f5e11;border:1px solid #f43f5e33;border-radius:10px;font-size:13px;color:#f43f5e;display:flex;align-items:center;gap:8px">
-  ⚠️ <strong>${overdue} overdue invoice${overdue !== 1 ? "s" : ""}</strong> — follow up with clients before the balance grows.
+  ! <strong>${overdue} overdue invoice${overdue !== 1 ? "s" : ""}</strong> — follow up with clients before the balance grows.
   <button class="btn btn-ghost btn-sm" style="margin-left:auto;color:#f43f5e;border-color:#f43f5e44;font-size:11px" onclick="navigate('invoices')">View →</button>
 </div>` : ""}
 
 <div class="grid-4" style="margin-bottom:24px">
   ${stats.map(s => `
   <div class="card">
-    <div style="height:3px;background:${s.color};border-radius:2px;margin-bottom:14px"></div>
-    <div class="stat-icon">${s.icon}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${s.color};letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;opacity:.7">◆</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:18px;margin-bottom:10px;color:#808b9e">${s.icon}</div>
     <div class="card-label">${s.label}</div>
     <div class="card-value" style="color:${s.color}">${s.val}</div>
     <div class="card-sub">${s.sub}</div>
@@ -135,17 +135,17 @@ ${overdue > 0 ? `
     <div class="section-title" style="margin-bottom:14px">Quick Actions</div>
     <div style="display:flex;flex-direction:column;gap:10px">
       ${[
-        { icon: "👥", label: "Add a Client",   page: "clients",      action: "openClientModal(null)" },
-        { icon: "📁", label: "New Project",     page: "projects",     action: "openProjectModal(null)" },
-        { icon: "🧾", label: "Create Invoice",  page: "invoices",     action: "openInvModal(null)" },
-        { icon: "💰", label: "Log a Payment",   page: "finances",     action: "openFinModal(null)" },
-        { icon: "📋", label: "Edit Business Plan", page: "business-plan", action: null },
-        { icon: "🔖", label: "Add Bookmark",        page: "bookmarks",     action: "openBmModal(null)" },
-        { icon: "⚡", label: "Log Tech Charge",     page: "tech-stack",    action: "openStackModal(null)" },
+        { icon: "◎", label: "Add a Client",   page: "clients",      action: "openClientModal(null)" },
+        { icon: "◫", label: "New Project",     page: "projects",     action: "openProjectModal(null)" },
+        { icon: "◻", label: "Create Invoice",  page: "invoices",     action: "openInvModal(null)" },
+        { icon: "◇", label: "Log a Payment",   page: "finances",     action: "openFinModal(null)" },
+        { icon: "◈", label: "Edit Business Plan", page: "business-plan", action: null },
+        { icon: "◆", label: "Add Bookmark",        page: "bookmarks",     action: "openBmModal(null)" },
+        { icon: "◉", label: "Log Tech Charge",     page: "tech-stack",    action: "openStackModal(null)" },
       ].map(q => `
       <button class="btn btn-ghost" style="justify-content:flex-start;gap:12px;text-align:left"
         onclick="${q.action ? `navigate('${q.page}');setTimeout(()=>${q.action},100)` : `navigate('${q.page}')`}">
-        <span style="font-size:16px">${q.icon}</span>${q.label}
+        <span style="font-family:'JetBrains Mono',monospace;font-size:13px;opacity:.7">${q.icon}</span>${q.label}
       </button>`).join("")}
     </div>
   </div>

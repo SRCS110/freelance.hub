@@ -92,7 +92,7 @@ function financesHTML() {
   ${[
     { label: "Total Income",    val: income,          color: "#10b981", icon: "📈" },
     { label: "Total Expenses",  val: expenses,        color: "#f43f5e", icon: "📉" },
-    { label: "Net Profit",      val: income - expenses, color: (income - expenses) >= 0 ? "#6366f1" : "#f43f5e", icon: "💼" },
+    { label: "Net Profit",      val: income - expenses, color: (income - expenses) >= 0 ? "#6366f1" : "#f43f5e", icon: "◫" },
   ].map(s => `
   <div class="card">
     <div style="font-size:22px;margin-bottom:8px">${s.icon}</div>
@@ -131,7 +131,7 @@ function financesHTML() {
     <div style="font-size:11px;color:#64748b;margin-top:5px">Expense ratio vs revenue</div>
     ${tax > 0 ? `
     <div style="margin-top:14px;padding:9px 12px;background:#0f1117;border-radius:8px;border:1px solid #2a3048;font-size:12px;color:#64748b">
-      💡 Set aside <strong style="color:#f59e0b">${usd(tax)}</strong> for quarterly taxes.
+      → Set aside <strong style="color:#f59e0b">${usd(tax)}</strong> for quarterly taxes.
     </div>` : ""}
   </div>
 </div>
@@ -181,7 +181,7 @@ ${Object.keys(byProject).length > 0 ? `
             </td>
             <td><div class="btn-row">
               <button class="btn btn-ghost btn-sm" onclick="openFinModal('${f.id}')">Edit</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteFin('${f.id}')">✕</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteFin('${f.id}')">×</button>
             </div></td>
           </tr>`;
         }).join("")}</tbody>

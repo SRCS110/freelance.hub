@@ -63,7 +63,7 @@ function _bookmarkCard(b) {
     </div>
     <div style="display:flex;gap:6px;flex-shrink:0">
       <button class="btn btn-ghost btn-sm" onclick="openBmModal('${b.id}')" style="padding:4px 8px;font-size:10px">edit</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteBm('${b.id}')" style="padding:4px 8px;font-size:10px">✕</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteBm('${b.id}')" style="padding:4px 8px;font-size:10px">×</button>
     </div>
   </div>
 
@@ -72,9 +72,9 @@ function _bookmarkCard(b) {
   ${hasCreds ? `
   <div style="padding:10px;background:#0a0a0c;border:1px solid #24242d;border-radius:6px;display:flex;flex-direction:column;gap:6px">
     <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#808b9e;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px">credentials</div>
-    ${b.login_email    ? `<div class="bookmark-cred">📧 <span>${b.login_email}</span><button class="bookmark-cred-reveal" onclick="navigator.clipboard.writeText('${b.login_email.replace(/'/g,"\\'")}');this.textContent='copied!';setTimeout(()=>this.textContent='copy',1200)">copy</button></div>` : ""}
-    ${b.login_username ? `<div class="bookmark-cred">👤 <span>${b.login_username}</span><button class="bookmark-cred-reveal" onclick="navigator.clipboard.writeText('${b.login_username.replace(/'/g,"\\'")}');this.textContent='copied!';setTimeout(()=>this.textContent='copy',1200)">copy</button></div>` : ""}
-    ${b.login_password ? `<div class="bookmark-cred">🔑 <span id="pw-${b.id}">••••••••</span>
+    ${b.login_email    ? `<div class="bookmark-cred">@ <span>${b.login_email}</span><button class="bookmark-cred-reveal" onclick="navigator.clipboard.writeText('${b.login_email.replace(/'/g,"\\'")}');this.textContent='copied!';setTimeout(()=>this.textContent='copy',1200)">copy</button></div>` : ""}
+    ${b.login_username ? `<div class="bookmark-cred">id <span>${b.login_username}</span><button class="bookmark-cred-reveal" onclick="navigator.clipboard.writeText('${b.login_username.replace(/'/g,"\\'")}');this.textContent='copied!';setTimeout(()=>this.textContent='copy',1200)">copy</button></div>` : ""}
+    ${b.login_password ? `<div class="bookmark-cred">pw <span id="pw-${b.id}">••••••••</span>
       <button class="bookmark-cred-reveal" onclick="toggleBmPw('${b.id}','${b.login_password.replace(/'/g,"\\'")}')">show</button>
       <button class="bookmark-cred-reveal" onclick="navigator.clipboard.writeText('${b.login_password.replace(/'/g,"\\'")}');this.textContent='copied!';setTimeout(()=>this.textContent='copy',1200)">copy</button>
     </div>` : ""}
