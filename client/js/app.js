@@ -10,7 +10,7 @@ let STATE = {
   data: {
     clients: [], projects: [], finances: [], invoices: [],
     business_plan: null, user_settings: null, project_credentials: [],
-    bookmarks: [], tech_stack: [],
+    bookmarks: [], tech_stack: [], workflow_templates: [], workflow_steps: [], workflow_runs: [], workflow_run_steps: [],
   },
   loading: true,
 };
@@ -29,6 +29,10 @@ async function loadAll() {
       db.list("project_credentials").catch(() => []),
       db.list("bookmarks").catch(() => []),
       db.list("tech_stack").catch(() => []),
+      db.list("workflow_templates").catch(() => []),
+      db.list("workflow_steps").catch(() => []),
+      db.list("workflow_runs").catch(() => []),
+      db.list("workflow_run_steps").catch(() => []),
     ]);
     STATE.data = {
       clients:             clients    || [],
@@ -39,7 +43,11 @@ async function loadAll() {
       user_settings:       (settingsList || [])[0] || null,
       project_credentials: projCreds  || [],
       bookmarks:           bookmarks  || [],
-      tech_stack:          techStack  || [],
+      tech_stack:          techStack   || [],
+      workflow_templates: wfTemplates  || [],
+      workflow_steps:     wfSteps      || [],
+      workflow_runs:      wfRuns       || [],
+      workflow_run_steps: wfRunSteps   || [],
     };
   } catch (e) {
     console.error("loadAll error:", e.message);
@@ -67,14 +75,15 @@ function sidebarHTML() {
   const overdueCt   = STATE.data.invoices.filter(i => i.status === "Overdue").length;
 
   const nav = [
-    { id: "dashboard",     label: "Dashboard",    icon: "⬡" },
-    { id: "clients",       label: "Clients",       icon: "👥" },
-    { id: "projects",      label: "Projects",      icon: "📁" },
-    { id: "finances",      label: "Finances",      icon: "💰" },
-    { id: "invoices",      label: "Invoices",      icon: "🧾" },
-    { id: "business-plan", label: "Business Plan", icon: "📋" },
-    { id: "bookmarks",     label: "Bookmarks",     icon: "🔖" },
-    { id: "tech-stack",    label: "Tech Stack",     icon: "⚡" },
+    { id: "dashboard",     label: "Dashboard",     icon: "◈" },
+    { id: "clients",       label: "Clients",        icon: "◎" },
+    { id: "projects",      label: "Projects",       icon: "◫" },
+    { id: "finances",      label: "Finances",       icon: "◇" },
+    { id: "invoices",      label: "Invoices",       icon: "◻" },
+    { id: "business-plan", label: "Business Plan",  icon: "◈" },
+    { id: "bookmarks",     label: "Bookmarks",      icon: "◆" },
+    { id: "tech-stack",    label: "Tech Stack",     icon: "◉" },
+    { id: "workflows",     label: "Workflows",      icon: "◳" },
   ];
 
   return `
@@ -85,7 +94,7 @@ function sidebarHTML() {
   </div>
   ${nav.map(n => `
   <div class="nav-item${STATE.page === n.id ? " active" : ""}" onclick="navigate('${n.id}')">
-    <span style="font-size:16px;width:20px;text-align:center">${n.icon}</span>
+    <span style="font-family:'JetBrains Mono',monospace;width:20px;text-align:center;font-size:13px">${n.icon}</span>
     ${n.label}
     ${n.id === "invoices" && overdueCt > 0
       ? `<span style="margin-left:auto;background:#f43f5e;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px">${overdueCt}</span>`
@@ -93,13 +102,19 @@ function sidebarHTML() {
   </div>`).join("")}
 
   <div class="sidebar-footer">
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <span>${_isLight() ? "light" : "dark"} mode</span>
+      <div class="theme-toggle-track${_isLight() ? " on" : ""}">
+        <div class="theme-toggle-thumb"></div>
+      </div>
+    </div>
     <div class="nav-item${STATE.page === "settings" ? " active" : ""}"
       onclick="navigate('settings')"
       style="padding:8px 20px;margin-bottom:8px;border-radius:0">
-      <span style="font-size:16px;width:20px;text-align:center">⚙️</span>
+      <span style="font-family:'JetBrains Mono',monospace;width:20px;text-align:center;font-size:14px">◈</span>
       ${displayName}
     </div>
-    <button class="logout-btn" onclick="doSignOut()">Sign Out</button>
+    <button class="logout-btn" onclick="doSignOut()">sign out</button>
   </div>
 </div>`;
 }
@@ -124,9 +139,27 @@ function render() {
   else if (STATE.page === "settings")                          content = userSettingsHTML();
   else if (STATE.page === "bookmarks")                         content = bookmarksHTML();
   else if (STATE.page === "tech-stack")                        content = techStackHTML();
+  else if (STATE.page === "workflows")                          content = workflowsHTML();
 
   root.innerHTML = sidebarHTML() + `<div class="main">${content}</div>`;
 }
+
+// ── Theme ─────────────────────────────────────────────────────
+function _isLight() { return document.body.classList.contains("light"); }
+
+window.toggleTheme = function() {
+  const light = !_isLight();
+  document.body.classList.toggle("light", light);
+  localStorage.setItem("fh_theme", light ? "light" : "dark");
+  render(); // re-render to update toggle state
+};
+
+// Apply saved theme immediately (before render)
+(function applyTheme() {
+  if (localStorage.getItem("fh_theme") === "light") {
+    document.body.classList.add("light");
+  }
+})();
 
 // ── Boot ──────────────────────────────────────────────────────
 function waitForAuth(cb, tries = 0) {
