@@ -140,6 +140,8 @@ ${overdue > 0 ? `
         { icon: "🧾", label: "Create Invoice",  page: "invoices",     action: "openInvModal(null)" },
         { icon: "💰", label: "Log a Payment",   page: "finances",     action: "openFinModal(null)" },
         { icon: "📋", label: "Edit Business Plan", page: "business-plan", action: null },
+        { icon: "🔖", label: "Add Bookmark",        page: "bookmarks",     action: "openBmModal(null)" },
+        { icon: "⚡", label: "Log Tech Charge",     page: "tech-stack",    action: "openStackModal(null)" },
       ].map(q => `
       <button class="btn btn-ghost" style="justify-content:flex-start;gap:12px;text-align:left"
         onclick="${q.action ? `navigate('${q.page}');setTimeout(()=>${q.action},100)` : `navigate('${q.page}')`}">
