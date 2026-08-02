@@ -169,9 +169,9 @@ ${Object.keys(byProject).length > 0 ? `
           const proj = projects.find(p => p.id === f.project_id);
           return `
           <tr>
-            <td style="color:#64748b">${fmtDate(f.date)}</td>
+            <td data-label="Date" style="color:var(--text-muted)">${fmtDate(f.date)}</td>
             <td style="font-weight:500">${f.description || "—"}</td>
-            <td><span style="font-size:11px;color:#38bdf8">${f.category}</span></td>
+            <td data-label="Category"><span style="font-size:11px;color:var(--accent)">${f.category}</span></td>
             <td style="color:#64748b;font-size:12px">${proj?.name || "—"}</td>
             <td>${f.type === "income"
               ? `<span class="badge" style="background:#10b98122;color:#10b981">income</span>`

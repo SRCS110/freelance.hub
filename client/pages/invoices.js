@@ -41,10 +41,10 @@ function invoicesHTML() {
         <thead><tr><th>#</th><th>Client</th><th>Project</th><th>Amount</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>${filtered.map(inv => `
         <tr>
-          <td style="color:#64748b;font-weight:600">${inv.invoice_number}</td>
+          <td data-label="#" style="color:var(--text-muted);font-weight:600">${inv.invoice_number}</td>
           <td style="font-weight:600;color:#fff">${inv.client_name || "—"}</td>
           <td style="color:#64748b">${inv.project_name || "—"}</td>
-          <td style="font-weight:700;color:#fff">${usd(inv.amount)}</td>
+          <td data-label="Amount" style="font-weight:700">${usd(inv.amount)}</td>
           <td style="color:${inv.status === 'Overdue' ? '#f43f5e' : '#64748b'}">${fmtDate(inv.due_date)}</td>
           <td>${badge(inv.status)}</td>
           <td><div class="btn-row" style="flex-wrap:wrap">
