@@ -5,16 +5,16 @@
 
 // ── Constants ─────────────────────────────────────────────────
 const STATUS_COLORS = {
-  Lead:      "#38bdf8",
-  Active:    "#10b981",
+  Lead:      "#3bf4a3",
+  Active:    "#3bf4a3",
   Review:    "#f59e0b",
-  Complete:  "#64748b",
-  Cancelled: "#f43f5e",
-  Draft:     "#64748b",
-  Sent:      "#38bdf8",
-  Paid:      "#10b981",
-  Overdue:   "#f43f5e",
-  Void:      "#475569",
+  Complete:  "#808b9e",
+  Cancelled: "#ff4757",
+  Draft:     "#808b9e",
+  Sent:      "#3bf4a3",
+  Paid:      "#3bf4a3",
+  Overdue:   "#ff4757",
+  Void:      "#24242d",
 };
 
 const TAX_CATS = [
@@ -39,8 +39,8 @@ function fmtDate(d) {
 
 // ── Badge HTML ────────────────────────────────────────────────
 function badge(status) {
-  const c = STATUS_COLORS[status] || "#64748b";
-  return `<span class="badge" style="background:${c}22;color:${c}">${status}</span>`;
+  const c = STATUS_COLORS[status] || "#808b9e";
+  return `<span class="badge" style="background:${c}18;color:${c};border:1px solid ${c}33">${status}</span>`;
 }
 
 // ── Modal ─────────────────────────────────────────────────────

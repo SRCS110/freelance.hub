@@ -10,6 +10,7 @@ let STATE = {
   data: {
     clients: [], projects: [], finances: [], invoices: [],
     business_plan: null, user_settings: null, project_credentials: [],
+    bookmarks: [], tech_stack: [],
   },
   loading: true,
 };
@@ -18,7 +19,7 @@ let STATE = {
 async function loadAll() {
   if (!STATE.user) return;
   try {
-    const [clients, projects, finances, invoices, bpList, settingsList, projCreds] = await Promise.all([
+    const [clients, projects, finances, invoices, bpList, settingsList, projCreds, bookmarks, techStack] = await Promise.all([
       db.list("clients"),
       db.list("projects"),
       db.list("finances"),
@@ -26,15 +27,19 @@ async function loadAll() {
       db.list("business_plan").catch(() => []),
       db.list("user_settings").catch(() => []),
       db.list("project_credentials").catch(() => []),
+      db.list("bookmarks").catch(() => []),
+      db.list("tech_stack").catch(() => []),
     ]);
     STATE.data = {
-      clients:             clients  || [],
-      projects:            projects || [],
-      finances:            finances || [],
-      invoices:            invoices || [],
+      clients:             clients    || [],
+      projects:            projects   || [],
+      finances:            finances   || [],
+      invoices:            invoices   || [],
       business_plan:       (bpList || [])[0] || null,
       user_settings:       (settingsList || [])[0] || null,
-      project_credentials: projCreds || [],
+      project_credentials: projCreds  || [],
+      bookmarks:           bookmarks  || [],
+      tech_stack:          techStack  || [],
     };
   } catch (e) {
     console.error("loadAll error:", e.message);
@@ -68,6 +73,8 @@ function sidebarHTML() {
     { id: "finances",      label: "Finances",      icon: "💰" },
     { id: "invoices",      label: "Invoices",      icon: "🧾" },
     { id: "business-plan", label: "Business Plan", icon: "📋" },
+    { id: "bookmarks",     label: "Bookmarks",     icon: "🔖" },
+    { id: "tech-stack",    label: "Tech Stack",     icon: "⚡" },
   ];
 
   return `
@@ -115,6 +122,8 @@ function render() {
   else if (STATE.page === "invoices")                          content = invoicesHTML();
   else if (STATE.page === "business-plan")                     content = businessPlanHTML();
   else if (STATE.page === "settings")                          content = userSettingsHTML();
+  else if (STATE.page === "bookmarks")                         content = bookmarksHTML();
+  else if (STATE.page === "tech-stack")                        content = techStackHTML();
 
   root.innerHTML = sidebarHTML() + `<div class="main">${content}</div>`;
 }
