@@ -19,7 +19,7 @@ let STATE = {
 async function loadAll() {
   if (!STATE.user) return;
   try {
-    const [clients, projects, finances, invoices, bpList, settingsList, projCreds, bookmarks, techStack, wfTemplates, wfSteps, wfRuns, wfRunSteps, projectTodos] = await Promise.all([
+    const [clients, projects, finances, invoices, bpList, settingsList, projCreds, bookmarks, techStack, wfTemplates, wfSteps, wfRuns, wfRunSteps, projectTodos, brainstormNotes, clientDocs] = await Promise.all([
       db.list("clients"),
       db.list("projects"),
       db.list("finances"),
@@ -34,6 +34,8 @@ async function loadAll() {
       db.list("workflow_runs").catch(() => []),
       db.list("workflow_run_steps").catch(() => []),
       db.list("project_todos").catch(() => []),
+      db.list("brainstorm").catch(() => []),
+      db.list("client_documents").catch(() => []),
     ]);
     STATE.data = {
       clients:             clients    || [],
@@ -49,7 +51,9 @@ async function loadAll() {
       workflow_steps:     wfSteps      || [],
       workflow_runs:      wfRuns       || [],
       workflow_run_steps: wfRunSteps   || [],
-      project_todos:      projectTodos || [],
+      project_todos:      projectTodos    || [],
+      brainstorm:         brainstormNotes || [],
+      client_documents:   clientDocs      || [],
     };
   } catch (e) {
     console.error("loadAll error:", e.message);
@@ -86,12 +90,15 @@ function sidebarHTML() {
     { id: "bookmarks",     label: "Bookmarks",      icon: "◆" },
     { id: "tech-stack",    label: "Tech Stack",     icon: "◉" },
     { id: "workflows",     label: "Workflows",      icon: "◳" },
+    { id: "brainstorm",    label: "Brainstorm",     icon: "◈" },
   ];
 
   return `
 <div class="sidebar">
   <div>
-    <div class="sidebar-logo">FreelanceHub</div>
+    <div class="sidebar-logo" onclick="navigate('dashboard')" style="cursor:pointer">
+      ${STATE.data.user_settings?.business_name || STATE.data.business_plan?.business_name || "FreelanceHub"}
+    </div>
     <div class="sidebar-sub">Business OS</div>
   </div>
   ${nav.map(n => `
@@ -126,7 +133,7 @@ function sidebarHTML() {
 function mobileBarHTML() {
   return `
 <div class="mobile-bar">
-  <div class="mobile-bar-logo">FreelanceHub</div>
+  <div class="mobile-bar-logo" onclick="navigate('dashboard')" style="cursor:pointer">${STATE.data.user_settings?.business_name || STATE.data.business_plan?.business_name || "FreelanceHub"}</div>
   <button class="hamburger" id="hamburger-btn" onclick="toggleDrawer()">
     <span></span><span></span><span></span>
   </button>
@@ -151,6 +158,7 @@ function _drawerNav() {
     { id: "bookmarks",     label: "Bookmarks",     icon: "◆" },
     { id: "tech-stack",    label: "Tech Stack",    icon: "◉" },
     { id: "workflows",     label: "Workflows",     icon: "◳" },
+    { id: "brainstorm",    label: "Brainstorm",    icon: "◈" },
   ];
   const overdueCt = STATE.data.invoices.filter(i => i.status === "Overdue").length;
   const s   = STATE.data.user_settings;
@@ -233,6 +241,7 @@ function render() {
     else if (STATE.page === "bookmarks")                         content = bookmarksHTML();
     else if (STATE.page === "tech-stack")                        content = techStackHTML();
     else if (STATE.page === "workflows")                         content = workflowsHTML();
+    else if (STATE.page === "brainstorm")                        content = brainstormHTML();
   } catch(e) {
     console.error("render error on page", STATE.page, ":", e.message, e.stack);
     content = `<div class="card" style="border-color:var(--danger)">
