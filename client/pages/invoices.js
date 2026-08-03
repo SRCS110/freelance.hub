@@ -36,7 +36,7 @@ function invoicesHTML() {
     ).join("")}
   </div>
   ${filtered.length === 0
-    ? `<div class="empty"><div class="empty-icon">🧾</div><div class="empty-text">No invoices here.</div></div>`
+    ? `<div class="empty"><div class="empty-icon" style="font-family:'JetBrains Mono',monospace">◻</div><div class="empty-text">No invoices here.</div></div>`
     : `<table class="tbl">
         <thead><tr><th>#</th><th>Client</th><th>Project</th><th>Amount</th><th>Due</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>${filtered.map(inv => `
@@ -175,6 +175,7 @@ window.openInvModal = async function(id) {
   // Seed one blank row if new invoice
   const initialItems = items.length > 0 ? items : [{ description: "", quantity: 1, unit_price: "" }];
 
+  _invItemCount = initialItems.length; // reset counter
   showModal(`
 <div class="modal-header">
   <div class="modal-title">${inv ? "Edit Invoice" : "New Invoice"}</div>
@@ -211,7 +212,7 @@ window.openInvModal = async function(id) {
   <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="addInvItem()">+ Add Line</button>
 </div>
 
-<div style="text-align:right;padding:12px 0;border-top:1px solid #2a3048;margin-bottom:16px">
+<div style="text-align:right;padding:12px 0;border-top:1px solid var(--border);margin-bottom:16px">
   <span style="font-size:13px;color:var(--text-muted)">Total: </span>
   <span id="inv-total-preview" style="font-size:18px;font-weight:700;color:var(--text);font-family:'Space Grotesk',sans-serif">
     ${usd(inv?.amount || 0)}
@@ -228,7 +229,7 @@ window.openInvModal = async function(id) {
   </button>
 </div>`, "large");
 
-  _recalcInvTotal();
+  setTimeout(() => _recalcInvTotal(), 50);
 };
 
 function _itemRowHTML(idx, it = {}) {
@@ -255,7 +256,7 @@ window.addInvItem = function() {
 window.removeInvItem = function(idx) {
   const row = document.getElementById("inv-item-" + idx);
   if (row) row.remove();
-  _recalcInvTotal();
+  setTimeout(() => _recalcInvTotal(), 50);
 };
 
 window.invItemChanged = function() { _recalcInvTotal(); };
