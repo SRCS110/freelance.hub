@@ -121,6 +121,38 @@ ${connPanelHTML(p.id)}
       ? `<div class="pf-block-val" style="font-family:monospace;font-size:13px">${p.files_notes}</div>`
       : `<div class="pf-block-empty">No files or links yet. Edit to paste Google Drive, Dropbox, or Figma links.</div>`}
   </div>
+</div>
+
+<div class="card" style="margin-top:16px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div class="section-title" style="display:flex;align-items:center;gap:10px">
+      to-do
+      <span id="todo-count-${p.id}" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);font-weight:400">
+        ${_projectTodos(p.id).filter(t=>!t.completed).length} remaining
+      </span>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="openTodoInput('${p.id}')">+ add</button>
+  </div>
+
+  <div id="todo-input-${p.id}" style="display:none;margin-bottom:14px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:4px">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input id="todo-text-${p.id}" placeholder="new task…"
+        style="flex:1;min-width:160px;font-size:13px"
+        onkeydown="if(event.key==='Enter')saveTodo('${p.id}');if(event.key==='Escape')closeTodoInput('${p.id}')"/>
+      <select id="todo-pri-${p.id}" style="width:90px;font-size:11px;padding:7px 6px">
+        <option value="normal">normal</option>
+        <option value="high">! high</option>
+        <option value="low">low</option>
+      </select>
+      <input id="todo-due-${p.id}" type="date" style="width:130px;font-size:11px"/>
+      <button class="btn btn-primary btn-sm" onclick="saveTodo('${p.id}')">add</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeTodoInput('${p.id}')">cancel</button>
+    </div>
+  </div>
+
+  <div id="todo-list-${p.id}">
+    ${_todoListHTML(p.id)}
+  </div>
 </div>`;
 }
 

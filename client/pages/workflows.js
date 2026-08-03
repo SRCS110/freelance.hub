@@ -73,9 +73,7 @@ function _templateCardHTML(t) {
   const steps    = (STATE.data.workflow_steps || []).filter(s => s.template_id === t.id);
   const color    = t.color || "#3bf4a3";
   return `
-<div style="background:var(--bg-raised);border:1px solid #24242d;border-left:3px solid ${color};border-radius:8px;padding:18px;cursor:pointer;transition:all .15s"
-  onmouseover="this.style.borderColor='${color}44 ${color}44 ${color}44 ${color}'"
-  onmouseout="this.style.borderColor='#24242d #24242d #24242d ${color}'"
+<div style="background:var(--bg-raised);border:1px solid var(--border);border-left:3px solid ${color};border-radius:4px;padding:18px;cursor:pointer;transition:border-color .15s"
   onclick="openWfTemplate('${t.id}')">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
     <div>
@@ -105,10 +103,8 @@ function _runCardHTML(r, dimmed = false) {
   const color     = template?.color || "#3bf4a3";
 
   return `
-<div style="background:var(--bg-raised);border:1px solid #24242d;border-radius:8px;padding:16px;${dimmed?"opacity:.6":""};cursor:pointer;transition:border-color .15s"
-  onclick="openWfRun('${r.id}')"
-  onmouseover="this.style.borderColor='${color}33'"
-  onmouseout="this.style.borderColor='var(--border)'">
+<div style="background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:16px;${dimmed?"opacity:.6":""};cursor:pointer;transition:border-color .15s"
+  onclick="openWfRun('${r.id}')">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:${total>0?"10px":"0"}">
     <div style="min-width:0">
       <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
@@ -168,7 +164,7 @@ function _templateDetailHTML() {
   ${steps.length === 0
     ? `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);padding:16px 0">no steps yet — add your first step below.</div>`
     : steps.map((s, i) => `
-  <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;padding:14px;background:var(--bg-raised);border:1px solid #24242d;border-radius:8px">
+  <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;padding:14px;background:var(--bg-raised);border:1px solid var(--border);border-radius:8px">
     <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${color};width:24px;flex-shrink:0;padding-top:1px">${i+1}.</div>
     <div style="flex:1;min-width:0">
       <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text)">${s.title}</div>
