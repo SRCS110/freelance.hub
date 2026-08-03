@@ -6,17 +6,26 @@
 // ============================================================
 
 const WF_CATS   = ["Client Onboarding","Project Kickoff","Invoice & Payment","Offboarding","Discovery","Design","Development","Marketing","Admin","Other"];
-const WF_COLORS = ["#3bf4a3","#38bdf8","#f59e0b","#ff4757","#8b5cf6","var(--text)"];
+const WF_COLORS = ["#3bf4a3","#38bdf8","#f59e0b","#ff4757","#8b5cf6","#94a3b8"];
 
 // ── View state ─────────────────────────────────────────────────
 // _wfView: "overview" | "template" | "run"
 // _wfTemplateId / _wfRunId: active record
 
 function workflowsHTML() {
-  const view = window._wfView || "overview";
-  if (view === "template") return _templateDetailHTML();
-  if (view === "run")      return _runDetailHTML();
-  return _overviewHTML();
+  try {
+    const view = window._wfView || "overview";
+    if (view === "template") return _templateDetailHTML();
+    if (view === "run")      return _runDetailHTML();
+    return _overviewHTML();
+  } catch(e) {
+    console.error("workflowsHTML error:", e.message, e.stack);
+    return `<div class="card" style="border-color:var(--danger)">
+      <div class="page-title">// workflows</div>
+      <div style="font-family:'JetBrains Mono',monospace;color:var(--danger);font-size:12px;margin-top:12px">error: ${e.message}</div>
+      <div style="font-family:'JetBrains Mono',monospace;color:var(--text-muted);font-size:11px;margin-top:8px">Check the browser console for details.</div>
+    </div>`;
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
