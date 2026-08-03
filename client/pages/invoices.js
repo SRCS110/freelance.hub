@@ -337,16 +337,6 @@ window.saveInv = async function(id) {
   }
 };
 
-// ── Wider modal support ────────────────────────────────────────
-const _origShowModal = window.showModal;
-window.showModal = function(html, size) {
-  const ov = document.createElement("div");
-  ov.className = "modal-overlay";
-  const maxW = size === "large" ? "680px" : "500px";
-  ov.innerHTML = `<div class="modal" style="max-width:${maxW}">${html}</div>`;
-  ov.addEventListener("click", e => { if (e.target === ov) closeModal(); });
-  document.body.appendChild(ov);
-  return ov;
-};
+
 
 window.invoicesHTML = invoicesHTML;

@@ -6,7 +6,7 @@
 // ============================================================
 
 const WF_CATS   = ["Client Onboarding","Project Kickoff","Invoice & Payment","Offboarding","Discovery","Design","Development","Marketing","Admin","Other"];
-const WF_COLORS = ["#3bf4a3","#38bdf8","#f59e0b","#ff4757","#8b5cf6","#e2e8f0"];
+const WF_COLORS = ["#3bf4a3","#38bdf8","#f59e0b","#ff4757","#8b5cf6","var(--text)"];
 
 // ── View state ─────────────────────────────────────────────────
 // _wfView: "overview" | "template" | "run"
@@ -43,7 +43,7 @@ function _overviewHTML() {
 <!-- Active runs -->
 ${runs.length > 0 ? `
 <div style="margin-bottom:28px">
-  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#808b9e;letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px">active runs</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px">active runs</div>
   <div style="display:flex;flex-direction:column;gap:8px">
     ${runs.map(r => _runCardHTML(r)).join("")}
   </div>
@@ -51,7 +51,7 @@ ${runs.length > 0 ? `
 
 <!-- Templates -->
 <div style="margin-bottom:28px">
-  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#808b9e;letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px">sop templates</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px">sop templates</div>
   ${templates.length === 0
     ? `<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">no templates yet — create your first SOP.</div></div>`
     : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
@@ -62,7 +62,7 @@ ${runs.length > 0 ? `
 <!-- Completed runs -->
 ${completed.length > 0 ? `
 <div>
-  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#808b9e;letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px">completed</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px">completed</div>
   <div style="display:flex;flex-direction:column;gap:6px">
     ${completed.map(r => _runCardHTML(r, true)).join("")}
   </div>
@@ -73,14 +73,14 @@ function _templateCardHTML(t) {
   const steps    = (STATE.data.workflow_steps || []).filter(s => s.template_id === t.id);
   const color    = t.color || "#3bf4a3";
   return `
-<div style="background:#121216;border:1px solid #24242d;border-left:3px solid ${color};border-radius:8px;padding:18px;cursor:pointer;transition:all .15s"
+<div style="background:var(--bg-raised);border:1px solid #24242d;border-left:3px solid ${color};border-radius:8px;padding:18px;cursor:pointer;transition:all .15s"
   onmouseover="this.style.borderColor='${color}44 ${color}44 ${color}44 ${color}'"
   onmouseout="this.style.borderColor='#24242d #24242d #24242d ${color}'"
   onclick="openWfTemplate('${t.id}')">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
     <div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#e2e8f0">${t.name}</div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#808b9e;margin-top:2px;text-transform:uppercase;letter-spacing:.4px">${t.category}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text)">${t.name}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:2px;text-transform:uppercase;letter-spacing:.4px">${t.category}</div>
     </div>
     <div style="display:flex;gap:6px">
       <button class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px;color:${color};border-color:${color}44"
@@ -91,7 +91,7 @@ function _templateCardHTML(t) {
         onclick="event.stopPropagation();deleteWfTemplate('${t.id}')">×</button>
     </div>
   </div>
-  ${t.description ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#808b9e;margin-bottom:10px;line-height:1.5">${t.description}</div>` : ""}
+  ${t.description ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.5">${t.description}</div>` : ""}
   <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${color}">${steps.length} step${steps.length!==1?"s":""}</div>
 </div>`;
 }
@@ -105,21 +105,21 @@ function _runCardHTML(r, dimmed = false) {
   const color     = template?.color || "#3bf4a3";
 
   return `
-<div style="background:#121216;border:1px solid #24242d;border-radius:8px;padding:16px;${dimmed?"opacity:.6":""};cursor:pointer;transition:border-color .15s"
+<div style="background:var(--bg-raised);border:1px solid #24242d;border-radius:8px;padding:16px;${dimmed?"opacity:.6":""};cursor:pointer;transition:border-color .15s"
   onclick="openWfRun('${r.id}')"
   onmouseover="this.style.borderColor='${color}33'"
-  onmouseout="this.style.borderColor='#24242d'">
+  onmouseout="this.style.borderColor='var(--border)'">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:${total>0?"10px":"0"}">
     <div style="min-width:0">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#808b9e;margin-top:2px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:2px">
         ${r.client_name ? `👥 ${r.client_name}` : ""}${r.client_name && r.project_name ? " · " : ""}${r.project_name ? `📁 ${r.project_name}` : ""}
         ${!r.client_name && !r.project_name ? "stand-alone" : ""}
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
       ${total > 0 ? `<span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${color}">${done}/${total}</span>` : ""}
-      ${!dimmed ? `<button class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px;color:#10b981;border-color:#10b98133"
+      ${!dimmed ? `<button class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px;color:var(--accent);border-color:var(--accent)33"
         onclick="event.stopPropagation();completeWfRun('${r.id}')">✓ done</button>` : ""}
       <button class="btn btn-danger btn-sm" style="font-size:10px;padding:3px 8px"
         onclick="event.stopPropagation();deleteWfRun('${r.id}')">×</button>
@@ -129,7 +129,7 @@ function _runCardHTML(r, dimmed = false) {
   <div class="progress-bar">
     <div class="progress-fill" style="width:${pct}%;background:${color}"></div>
   </div>
-  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#808b9e;margin-top:4px">${pct}% complete</div>` : ""}
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:4px">${pct}% complete</div>` : ""}
 </div>`;
 }
 
@@ -146,7 +146,7 @@ function _templateDetailHTML() {
   const color    = t.color || "#3bf4a3";
 
   return `
-<div style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#808b9e;margin-bottom:20px;cursor:pointer" onclick="window._wfView='overview';render()">
+<div style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-bottom:20px;cursor:pointer" onclick="window._wfView='overview';render()">
   ← back to workflows
 </div>
 
@@ -157,22 +157,22 @@ function _templateDetailHTML() {
   </div>
   <div class="btn-row">
     <button class="btn btn-ghost" onclick="openWfTemplateModal('${t.id}')">edit template</button>
-    <button class="btn btn-primary" style="background:${color};color:#0a0a0c" onclick="openWfRunModal('${t.id}')">▶ start run</button>
+    <button class="btn btn-primary" style="background:${color};color:var(--bg)" onclick="openWfRunModal('${t.id}')">▶ start run</button>
   </div>
 </div>
 
 <div style="margin-bottom:16px">
-  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#808b9e;letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px">
     steps (${steps.length})
   </div>
   ${steps.length === 0
-    ? `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#808b9e;padding:16px 0">no steps yet — add your first step below.</div>`
+    ? `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);padding:16px 0">no steps yet — add your first step below.</div>`
     : steps.map((s, i) => `
-  <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;padding:14px;background:#121216;border:1px solid #24242d;border-radius:8px">
+  <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;padding:14px;background:var(--bg-raised);border:1px solid #24242d;border-radius:8px">
     <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${color};width:24px;flex-shrink:0;padding-top:1px">${i+1}.</div>
     <div style="flex:1;min-width:0">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#e2e8f0">${s.title}</div>
-      ${s.description ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#808b9e;margin-top:4px;line-height:1.5">${s.description}</div>` : ""}
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text)">${s.title}</div>
+      ${s.description ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.5">${s.description}</div>` : ""}
     </div>
     <div style="display:flex;gap:6px;flex-shrink:0">
       <button class="btn btn-ghost btn-sm" style="font-size:10px;padding:3px 8px" onclick="openStepModal('${t.id}','${s.id}')">edit</button>
@@ -200,7 +200,7 @@ function _runDetailHTML() {
   const color    = template?.color || "#3bf4a3";
 
   return `
-<div style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#808b9e;margin-bottom:20px;cursor:pointer" onclick="window._wfView='overview';render()">
+<div style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-bottom:20px;cursor:pointer" onclick="window._wfView='overview';render()">
   ← back to workflows
 </div>
 
@@ -220,7 +220,7 @@ function _runDetailHTML() {
 
 <div style="margin-bottom:20px">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#808b9e">${done} of ${total} steps complete</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted)">${done} of ${total} steps complete</span>
     <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${color}">${pct}%</span>
   </div>
   <div class="progress-bar" style="height:6px">
@@ -230,26 +230,26 @@ function _runDetailHTML() {
 
 <div style="display:flex;flex-direction:column;gap:8px">
   ${steps.length === 0
-    ? `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#808b9e;padding:16px 0">no steps in this run.</div>`
+    ? `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);padding:16px 0">no steps in this run.</div>`
     : steps.map((s, i) => `
-  <div style="display:flex;gap:12px;align-items:flex-start;padding:16px;background:#121216;border:1px solid ${s.completed ? color+"33" : "#24242d"};border-radius:8px;transition:all .2s;opacity:${s.completed?"0.65":"1"}">
+  <div style="display:flex;gap:12px;align-items:flex-start;padding:16px;background:var(--bg-raised);border:1px solid ${s.completed ? color+"33" : "var(--border)"};border-radius:8px;transition:all .2s;opacity:${s.completed?"0.65":"1"}">
     <div style="padding-top:1px;flex-shrink:0">
       <button onclick="toggleStep('${s.id}',${s.completed})"
-        style="width:20px;height:20px;border-radius:4px;border:2px solid ${s.completed ? color : "#24242d"};background:${s.completed ? color : "transparent"};cursor:pointer;display:flex;align-items:center;justify-content:center;color:#0a0a0c;font-size:11px;font-weight:900;transition:all .15s;flex-shrink:0">
+        style="width:20px;height:20px;border-radius:4px;border:2px solid ${s.completed ? color : "var(--border)"};background:${s.completed ? color : "transparent"};cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:11px;font-weight:900;transition:all .15s;flex-shrink:0">
         ${s.completed ? "✓" : ""}
       </button>
     </div>
     <div style="flex:1;min-width:0">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${s.completed ? "#808b9e" : "#e2e8f0"};${s.completed?"text-decoration:line-through":""}">${i+1}. ${s.title}</div>
-      ${s.description ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#808b9e;margin-top:4px;line-height:1.5">${s.description}</div>` : ""}
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${s.completed ? "var(--text-muted)" : "var(--text)"};${s.completed?"text-decoration:line-through":""}">${i+1}. ${s.title}</div>
+      ${s.description ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.5">${s.description}</div>` : ""}
       ${s.completed && s.completed_at ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${color};margin-top:4px">completed ${fmtDate(s.completed_at)}</div>` : ""}
       ${!s.completed ? `
       <div style="margin-top:8px">
         <input placeholder="add a note…" id="note-${s.id}"
-          style="font-size:11px;padding:5px 8px;background:#0a0a0c;border-color:#24242d;border-radius:4px"
+          style="font-size:11px;padding:5px 8px;background:var(--bg);border-color:var(--border);border-radius:4px"
           value="${s.notes || ""}"
           onblur="saveStepNote('${s.id}',this.value)"/>
-      </div>` : s.notes ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#808b9e;margin-top:4px;font-style:italic">"${s.notes}"</div>` : ""}
+      </div>` : s.notes ? `<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:4px;font-style:italic">"${s.notes}"</div>` : ""}
     </div>
   </div>`).join("")}
 </div>`;
