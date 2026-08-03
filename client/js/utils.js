@@ -47,7 +47,7 @@ function badge(status) {
 function showModal(html, size) {
   const ov = document.createElement("div");
   ov.className = "modal-overlay";
-  const maxW = size === "large" ? "680px" : "500px";
+  const maxW = size === "large" ? "720px" : size === "xl" ? "900px" : "500px";
   ov.innerHTML = `<div class="modal" style="max-width:${maxW}">${html}</div>`;
   ov.addEventListener("click", e => {
     if (e.target === ov) closeModal();
