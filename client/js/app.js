@@ -221,17 +221,25 @@ function render() {
   }
 
   let content = "";
-  if      (STATE.page === "dashboard")                         content = dashboardHTML();
-  else if (STATE.page === "clients")                           content = clientsHTML();
-  else if (STATE.page === "projects" && STATE.openProject)     content = projectFileHTML(STATE.openProject);
-  else if (STATE.page === "projects")                          content = projectsListHTML();
-  else if (STATE.page === "finances")                          content = financesHTML();
-  else if (STATE.page === "invoices")                          content = invoicesHTML();
-  else if (STATE.page === "business-plan")                     content = businessPlanHTML();
-  else if (STATE.page === "settings")                          content = userSettingsHTML();
-  else if (STATE.page === "bookmarks")                         content = bookmarksHTML();
-  else if (STATE.page === "tech-stack")                        content = techStackHTML();
-  else if (STATE.page === "workflows")                          content = workflowsHTML();
+  try {
+    if      (STATE.page === "dashboard")                         content = dashboardHTML();
+    else if (STATE.page === "clients")                           content = clientsHTML();
+    else if (STATE.page === "projects" && STATE.openProject)     content = projectFileHTML(STATE.openProject);
+    else if (STATE.page === "projects")                          content = projectsListHTML();
+    else if (STATE.page === "finances")                          content = financesHTML();
+    else if (STATE.page === "invoices")                          content = invoicesHTML();
+    else if (STATE.page === "business-plan")                     content = businessPlanHTML();
+    else if (STATE.page === "settings")                          content = userSettingsHTML();
+    else if (STATE.page === "bookmarks")                         content = bookmarksHTML();
+    else if (STATE.page === "tech-stack")                        content = techStackHTML();
+    else if (STATE.page === "workflows")                         content = workflowsHTML();
+  } catch(e) {
+    console.error("render error on page", STATE.page, ":", e.message, e.stack);
+    content = `<div class="card" style="border-color:var(--danger)">
+      <div style="font-family:'JetBrains Mono',monospace;color:var(--danger);font-size:13px;margin-bottom:8px">render error — ${STATE.page}</div>
+      <div style="font-family:'JetBrains Mono',monospace;color:var(--text-muted);font-size:11px">${e.message}</div>
+    </div>`;
+  }
 
   root.innerHTML = sidebarHTML() + mobileBarHTML() + `<div class="main">${content}</div>`;
 }
