@@ -66,7 +66,7 @@ function userSettingsHTML() {
   <div class="form-group">
     <label class="form-label">Business Name</label>
     <input id="us-business-name" value="${s.business_name || ""}" placeholder="Acme Freelance Co."/>
-    <div style="font-size:11px;color:#475569;margin-top:4px">Used on invoice headers and exports.</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Used on invoice headers and exports.</div>
   </div>
 </div>
 
@@ -90,7 +90,7 @@ function userSettingsHTML() {
       <label class="form-label">Tax Rate (%)</label>
       <input id="us-tax-rate" type="number" min="0" max="100" step="0.1"
         value="${s.tax_rate ?? 25}" placeholder="25"/>
-      <div style="font-size:11px;color:#475569;margin-top:4px">Used for tax estimates on Dashboard and Finances.</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Used for tax estimates on Dashboard and Finances.</div>
     </div>
   </div>
   <div class="form-row">
@@ -125,14 +125,14 @@ function userSettingsHTML() {
     <span style="font-size:20px">◉</span>
     <div>
       <div class="section-title" style="color:#f59e0b">Project Credentials</div>
-      <div style="font-size:12px;color:#64748b;margin-top:2px">
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
         Per-project Supabase and OAuth credentials — stored in your database, available on every device.
       </div>
     </div>
   </div>
 
   ${STATE.data.projects.length === 0
-    ? `<div style="color:#64748b;font-size:13px;padding:12px 0">
+    ? `<div style="color:var(--text-muted);font-size:13px;padding:12px 0">
         No projects yet. <span style="color:#6366f1;cursor:pointer" onclick="navigate('projects')">Create one first →</span>
       </div>`
     : STATE.data.projects.map(p => _projectCredBlock(p)).join("")
@@ -147,14 +147,14 @@ function userSettingsHTML() {
   </div>
 
   <div style="margin-bottom:20px">
-    <div style="font-size:13px;color:#e2e8f0;font-weight:500;margin-bottom:4px">Change Password</div>
-    <div style="font-size:12px;color:#64748b;margin-bottom:12px">A reset link will be sent to <strong style="color:#e2e8f0">${usr?.email || ""}</strong></div>
+    <div style="font-size:13px;color:var(--text);font-weight:500;margin-bottom:4px">Change Password</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">A reset link will be sent to <strong style="color:var(--text)">${usr?.email || ""}</strong></div>
     <button class="btn btn-ghost" onclick="sendPasswordReset()">Send Reset Email</button>
   </div>
 
   <div style="padding-top:16px;border-top:1px solid #2a3048">
-    <div style="font-size:13px;color:#e2e8f0;font-weight:500;margin-bottom:4px">Sign Out Everywhere</div>
-    <div style="font-size:12px;color:#64748b;margin-bottom:12px">Clears your session tokens on this device.</div>
+    <div style="font-size:13px;color:var(--text);font-weight:500;margin-bottom:4px">Sign Out Everywhere</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Clears your session tokens on this device.</div>
     <button class="btn btn-danger" onclick="doSignOut()">Sign Out</button>
   </div>
 </div>`;
@@ -170,8 +170,8 @@ function _projectCredBlock(p) {
 <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #2a3048">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
     <div>
-      <div style="font-weight:600;color:#fff;font-size:14px">${p.name}</div>
-      <div style="font-size:11px;color:#64748b">${p.client_name || "No client"}</div>
+      <div style="font-weight:600;color:var(--text);font-size:14px">${p.name}</div>
+      <div style="font-size:11px;color:var(--text-muted)">${p.client_name || "No client"}</div>
     </div>
     <div style="display:flex;gap:8px">
       <span class="conn-badge ${sbOk ? "ok" : "miss"}">${sbOk ? "✓" : "○"} Supabase</span>
@@ -269,8 +269,13 @@ window.saveUserSettings = async function() {
 
 // ── Project credentials ───────────────────────────────────────
 window.toggleProjEye = function(pid, field) {
-  const el = document.getElementById(`pc-${pid}-${field}`);
-  if (el) el.type = el.type === "password" ? "text" : "password";
+  requirePin(() => {
+    const el = document.getElementById(`pc-${pid}-${field}`);
+    if (!el) return;
+    el.type = el.type === "password" ? "text" : "password";
+    // Auto-hide after 30 seconds
+    if (el.type === "text") setTimeout(() => { el.type = "password"; }, 30000);
+  });
 };
 
 window.saveProjCreds = async function(pid) {
@@ -307,6 +312,18 @@ window.clearProjCreds = async function(pid) {
 };
 
 // ── Password reset ────────────────────────────────────────────
+window._showChangePinFlow = function() {
+  // After PIN verified, show create-PIN modal to set a new one
+  // Clear existing hash first so _showCreatePinModal triggers
+  const existing = STATE.data.user_settings;
+  if (existing?.id) {
+    db.update("user_settings", existing.id, { pin_hash: null }).then(() => {
+      clearPinSession();
+      loadAll().then(() => requirePin(() => render()));
+    });
+  }
+};
+
 window.sendPasswordReset = async function() {
   const email = STATE.user?.email;
   if (!email) return;
