@@ -108,9 +108,9 @@ function financesHTML() {
     <div class="section-title" style="margin-bottom:14px">By Tax Category</div>
     <div style="display:flex;flex-direction:column;gap:8px">
       ${catTotals.map(({ cat, total }) => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0f1117;border-radius:8px;border:1px solid #2a3048">
-        <span style="font-size:12px;color:#64748b">${cat}</span>
-        <span style="font-weight:700;color:#fff;font-family:'Space Grotesk',sans-serif">${usd(total)}</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+        <span style="font-size:12px;color:var(--text-muted)">${cat}</span>
+        <span style="font-weight:700;color:var(--text);font-family:'Space Grotesk',sans-serif">${usd(total)}</span>
       </div>`).join("")}
     </div>
   </div>` : `<div class="card"><div class="empty-text" style="color:#2a3048;text-align:center;padding:20px">No entries this period.</div></div>`}
@@ -118,19 +118,19 @@ function financesHTML() {
   <div class="card">
     <div class="section-title" style="margin-bottom:14px">Tax Estimate (25%)</div>
     <div style="margin-bottom:12px">
-      <div style="font-size:12px;color:#64748b;margin-bottom:3px">Net Profit</div>
-      <div style="font-size:22px;font-weight:700;color:#fff;font-family:'Space Grotesk',sans-serif">${usd(income - expenses)}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px">Net Profit</div>
+      <div style="font-size:22px;font-weight:700;color:var(--text);font-family:'Space Grotesk',sans-serif">${usd(income - expenses)}</div>
     </div>
     <div style="margin-bottom:12px">
-      <div style="font-size:12px;color:#64748b;margin-bottom:3px">Estimated Tax</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px">Estimated Tax</div>
       <div style="font-size:22px;font-weight:700;color:#f59e0b;font-family:'Space Grotesk',sans-serif">${usd(tax)}</div>
     </div>
     <div class="progress-bar">
       <div class="progress-fill" style="width:${income > 0 ? Math.min(100, (expenses / income) * 100) : 0}%"></div>
     </div>
-    <div style="font-size:11px;color:#64748b;margin-top:5px">Expense ratio vs revenue</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:5px">Expense ratio vs revenue</div>
     ${tax > 0 ? `
-    <div style="margin-top:14px;padding:9px 12px;background:#0f1117;border-radius:8px;border:1px solid #2a3048;font-size:12px;color:#64748b">
+    <div style="margin-top:14px;padding:9px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--text-muted)">
       → Set aside <strong style="color:#f59e0b">${usd(tax)}</strong> for quarterly taxes.
     </div>` : ""}
   </div>
@@ -141,8 +141,8 @@ ${Object.keys(byProject).length > 0 ? `
   <div class="section-title" style="margin-bottom:14px">Income by Project</div>
   <div style="display:flex;flex-direction:column;gap:6px">
     ${Object.values(byProject).sort((a,b) => b.total - a.total).map(p => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0f1117;border-radius:8px;border:1px solid #2a3048">
-      <span style="font-size:13px;color:#e2e8f0;font-weight:500">${p.name}</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+      <span style="font-size:13px;color:var(--text);font-weight:500">${p.name}</span>
       <span style="font-weight:700;color:#10b981;font-family:'Space Grotesk',sans-serif">${usd(p.total)}</span>
     </div>`).join("")}
   </div>
@@ -172,7 +172,7 @@ ${Object.keys(byProject).length > 0 ? `
             <td data-label="Date" style="color:var(--text-muted)">${fmtDate(f.date)}</td>
             <td style="font-weight:500">${f.description || "—"}</td>
             <td data-label="Category"><span style="font-size:11px;color:var(--accent)">${f.category}</span></td>
-            <td style="color:#64748b;font-size:12px">${proj?.name || "—"}</td>
+            <td style="color:var(--text-muted);font-size:12px">${proj?.name || "—"}</td>
             <td>${f.type === "income"
               ? `<span class="badge" style="background:#10b98122;color:#10b981">income</span>`
               : `<span class="badge" style="background:#f43f5e22;color:#f43f5e">expense</span>`}</td>

@@ -47,7 +47,7 @@ ${stack.length === 0
   ? `<div class="empty"><div class="empty-icon">⚡</div><div class="empty-text">no services tracked yet.</div></div>`
   : Object.entries(byCat).map(([cat, items]) => `
 <div style="margin-bottom:24px">
-  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#808b9e;letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--text-muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
     <span>${cat}</span>
     <span style="color:#3bf4a3">${usd(items.reduce((s,i)=>s+Number(i.cycle==="monthly"?i.amount:0),0))}/mo</span>
   </div>
@@ -62,7 +62,7 @@ ${stack.length === 0
       <div style="text-align:right;flex-shrink:0">
         <div class="stack-amt">${usd(s.amount)}</div>
         <div class="stack-cycle">/${s.cycle}</div>
-        ${s.renewal_date ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#808b9e;margin-top:2px">renews ${fmtDate(s.renewal_date)}</div>` : ""}
+        ${s.renewal_date ? `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:2px">renews ${fmtDate(s.renewal_date)}</div>` : ""}
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         <button class="btn btn-ghost btn-sm" onclick="openStackModal('${s.id}')" style="font-size:10px;padding:4px 8px">edit</button>

@@ -23,10 +23,10 @@ ${clients.length === 0
         <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>${clients.map(c => `
         <tr>
-          <td style="font-weight:600;color:#fff">${c.name}</td>
-          <td style="color:#64748b">${c.company || "—"}</td>
-          <td style="color:#64748b">${c.email || "—"}</td>
-          <td style="color:#64748b">${c.phone || "—"}</td>
+          <td style="font-weight:600;color:var(--text)">${c.name}</td>
+          <td style="color:var(--text-muted)">${c.company || "—"}</td>
+          <td style="color:var(--text-muted)">${c.email || "—"}</td>
+          <td style="color:var(--text-muted)">${c.phone || "—"}</td>
           <td>${badge(c.status)}</td>
           <td><div class="btn-row">
             <button class="btn btn-ghost btn-sm" onclick="openClientModal('${c.id}')">Edit</button>

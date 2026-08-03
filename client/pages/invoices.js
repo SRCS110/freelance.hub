@@ -42,8 +42,8 @@ function invoicesHTML() {
         <tbody>${filtered.map(inv => `
         <tr>
           <td data-label="#" style="color:var(--text-muted);font-weight:600">${inv.invoice_number}</td>
-          <td style="font-weight:600;color:#fff">${inv.client_name || "—"}</td>
-          <td style="color:#64748b">${inv.project_name || "—"}</td>
+          <td style="font-weight:600;color:var(--text)">${inv.client_name || "—"}</td>
+          <td style="color:var(--text-muted)">${inv.project_name || "—"}</td>
           <td data-label="Amount" style="font-weight:700">${usd(inv.amount)}</td>
           <td style="color:${inv.status === 'Overdue' ? '#f43f5e' : '#64748b'}">${fmtDate(inv.due_date)}</td>
           <td>${badge(inv.status)}</td>
@@ -96,7 +96,7 @@ window.printInvoice = async function(id) {
   .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
   .status-Paid    { background:#dcfce7; color:#16a34a; }
   .status-Sent    { background:#dbeafe; color:#2563eb; }
-  .status-Draft   { background:#f1f5f9; color:#64748b; }
+  .status-Draft   { background:#f1f5f9; color:var(--text-muted); }
   .status-Overdue { background:#fee2e2; color:#dc2626; }
   .status-Void    { background:#f1f5f9; color:#94a3b8; text-decoration:line-through; }
   .notes { margin-top: 24px; padding: 16px; background: #f8fafc; border-radius: 8px; font-size: 12px; color: #64748b; }
@@ -109,7 +109,7 @@ window.printInvoice = async function(id) {
     <div class="inv-biz">${bizName}</div>
   </div>
   <div class="inv-meta">
-    <div style="font-size:20px;font-weight:700;color:#1e293b;margin-bottom:6px">INVOICE</div>
+    <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px">INVOICE</div>
     <div><strong>#${inv.invoice_number}</strong></div>
     <div>Issued: ${new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</div>
     ${inv.due_date ? `<div>Due: <strong>${fmtDate(inv.due_date)}</strong></div>` : ""}
@@ -121,7 +121,7 @@ window.printInvoice = async function(id) {
   <div class="inv-party">
     <h3>Bill To</h3>
     <p>${inv.client_name || "—"}</p>
-    ${inv.project_name ? `<div style="color:#64748b;margin-top:4px">Re: ${inv.project_name}</div>` : ""}
+    ${inv.project_name ? `<div style="color:var(--text-muted);margin-top:4px">Re: ${inv.project_name}</div>` : ""}
   </div>
 </div>
 
@@ -204,7 +204,7 @@ window.openInvModal = async function(id) {
   <input id="i-due" type="date" value="${inv?.due_date || ""}"/></div>
 
 <div style="margin-bottom:16px">
-  <div style="font-size:11px;font-weight:600;color:#64748b;letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px">Line Items</div>
+  <div style="font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px">Line Items</div>
   <div id="inv-items-wrap">
     ${initialItems.map((it, idx) => _itemRowHTML(idx, it)).join("")}
   </div>
@@ -212,8 +212,8 @@ window.openInvModal = async function(id) {
 </div>
 
 <div style="text-align:right;padding:12px 0;border-top:1px solid #2a3048;margin-bottom:16px">
-  <span style="font-size:13px;color:#64748b">Total: </span>
-  <span id="inv-total-preview" style="font-size:18px;font-weight:700;color:#fff;font-family:'Space Grotesk',sans-serif">
+  <span style="font-size:13px;color:var(--text-muted)">Total: </span>
+  <span id="inv-total-preview" style="font-size:18px;font-weight:700;color:var(--text);font-family:'Space Grotesk',sans-serif">
     ${usd(inv?.amount || 0)}
   </span>
 </div>
@@ -240,7 +240,7 @@ function _itemRowHTML(idx, it = {}) {
     oninput="_recalcInvTotal()" class="inv-item-qty" style="font-size:13px"/>
   <input type="number" placeholder="Rate" value="${it.unit_price || ""}" min="0" step="0.01"
     oninput="_recalcInvTotal()" class="inv-item-rate" style="font-size:13px"/>
-  <button onclick="removeInvItem(${idx})" style="background:none;border:none;color:#64748b;font-size:16px;cursor:pointer;padding:0;line-height:1">×</button>
+  <button onclick="removeInvItem(${idx})" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:0;line-height:1">×</button>
 </div>`;
 }
 

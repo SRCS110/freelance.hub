@@ -36,7 +36,7 @@ function bookmarksHTML() {
     <input id="bm-search" value="${search}" placeholder="search bookmarks…"
       oninput="window._bmSearch=this.value;render()"
       style="padding-left:32px"/>
-    <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#808b9e;font-size:14px">⌕</span>
+    <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px">⌕</span>
   </div>
   <div class="filter-row" style="margin:0;gap:6px">
     ${["All",...BM_TAGS].map(t =>
@@ -67,11 +67,11 @@ function _bookmarkCard(b) {
     </div>
   </div>
 
-  ${b.description ? `<div style="font-size:11px;color:#808b9e;font-family:'JetBrains Mono',monospace;line-height:1.5">${b.description}</div>` : ""}
+  ${b.description ? `<div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;line-height:1.5">${b.description}</div>` : ""}
 
   ${hasCreds ? `
-  <div style="padding:10px;background:#0a0a0c;border:1px solid #24242d;border-radius:6px;display:flex;flex-direction:column;gap:6px">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#808b9e;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px">credentials</div>
+  <div style="padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;display:flex;flex-direction:column;gap:6px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px">credentials</div>
     ${b.login_email    ? `<div class="bookmark-cred">@ <span>${b.login_email}</span><button class="bookmark-cred-reveal" onclick="navigator.clipboard.writeText('${b.login_email.replace(/'/g,"\\'")}');this.textContent='copied!';setTimeout(()=>this.textContent='copy',1200)">copy</button></div>` : ""}
     ${b.login_username ? `<div class="bookmark-cred">id <span>${b.login_username}</span><button class="bookmark-cred-reveal" onclick="navigator.clipboard.writeText('${b.login_username.replace(/'/g,"\\'")}');this.textContent='copied!';setTimeout(()=>this.textContent='copy',1200)">copy</button></div>` : ""}
     ${b.login_password ? `<div class="bookmark-cred">pw <span id="pw-${b.id}">••••••••</span>
@@ -153,7 +153,7 @@ window.openBmModal = function(id) {
 </div>
 
 <div style="margin:16px 0 12px;padding-top:14px;border-top:1px solid #24242d">
-  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#808b9e;letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px">login credentials (optional)</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px">login credentials (optional)</div>
   <div class="form-row">
     <div class="form-group">
       <label class="form-label">Email</label>
@@ -180,7 +180,7 @@ window.openBmModal = function(id) {
 <div class="form-group">
   <label class="form-label">Monthly Cost ($)</label>
   <input id="bm-cost" type="number" min="0" step="0.01" value="${b?.monthly_cost||""}" placeholder="0.00"/>
-  <div style="font-size:10px;color:#808b9e;font-family:'JetBrains Mono',monospace;margin-top:4px">if this is a paid subscription, shows in total above</div>
+  <div style="font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;margin-top:4px">if this is a paid subscription, shows in total above</div>
 </div>
 
 <div class="modal-actions">

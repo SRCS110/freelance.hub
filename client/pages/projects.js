@@ -46,10 +46,10 @@ ${filtered.length === 0
     </div>
     ${badge(p.status)}
   </div>
-  ${p.description ? `<div style="font-size:12px;color:#64748b;line-height:1.5;margin:8px 0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.description}</div>` : ""}
+  ${p.description ? `<div style="font-size:12px;color:var(--text-muted);line-height:1.5;margin:8px 0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.description}</div>` : ""}
   <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">
-    ${p.deadline ? `<span style="font-size:11px;color:#64748b">📅 ${fmtDate(p.deadline)}</span>` : ""}
-    ${p.budget   ? `<span style="font-size:11px;color:#64748b">💰 ${usd(p.budget)}</span>`        : ""}
+    ${p.deadline ? `<span style="font-size:11px;color:var(--text-muted)">📅 ${fmtDate(p.deadline)}</span>` : ""}
+    ${p.budget   ? `<span style="font-size:11px;color:var(--text-muted)">💰 ${usd(p.budget)}</span>`        : ""}
   </div>
   <div style="display:flex;gap:14px;padding-top:12px;border-top:1px solid #2a3048">
     <span style="font-size:11px;color:${sbOk ? "#10b981" : "#64748b"};display:flex;align-items:center">
@@ -73,7 +73,7 @@ function projectFileHTML(p) {
 <div class="breadcrumb">
   <span class="breadcrumb-link" onclick="navigate('projects')">Projects</span>
   <span style="color:#2a3048">/</span>
-  <span style="color:#e2e8f0">${p.name}</span>
+  <span style="color:var(--text)">${p.name}</span>
 </div>
 
 <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px">
@@ -82,9 +82,9 @@ function projectFileHTML(p) {
     <div class="page-title">${p.name}</div>
     <div class="pf-meta">
       ${badge(p.status)}
-      ${client  ? `<span style="font-size:12px;color:#64748b">👥 ${client.name}</span>`     : ""}
-      ${p.deadline ? `<span style="font-size:12px;color:#64748b">📅 ${fmtDate(p.deadline)}</span>` : ""}
-      ${p.budget   ? `<span style="font-size:12px;color:#64748b">💰 ${usd(p.budget)}</span>`       : ""}
+      ${client  ? `<span style="font-size:12px;color:var(--text-muted)">👥 ${client.name}</span>`     : ""}
+      ${p.deadline ? `<span style="font-size:12px;color:var(--text-muted)">📅 ${fmtDate(p.deadline)}</span>` : ""}
+      ${p.budget   ? `<span style="font-size:12px;color:var(--text-muted)">💰 ${usd(p.budget)}</span>`       : ""}
     </div>
   </div>
   <div class="btn-row">
@@ -111,8 +111,8 @@ ${connPanelHTML(p.id)}
       { label: "Budget",   val: p.budget ? usd(p.budget) : "—" },
     ].map(r => `
     <div class="pf-detail-row">
-      <span style="color:#64748b">${r.label}</span>
-      <span style="color:#fff;font-weight:500">${r.val}</span>
+      <span style="color:var(--text-muted)">${r.label}</span>
+      <span style="color:var(--text);font-weight:500">${r.val}</span>
     </div>`).join("")}
   </div>
   <div class="pf-block pf-full">
@@ -174,7 +174,7 @@ function connPanelHTML(pid) {
     </div>
   </div>
   ${!sbOk && !goOk ? `
-  <div style="padding:12px 20px;border-top:1px solid #2a3048;font-size:12px;color:#64748b">
+  <div style="padding:12px 20px;border-top:1px solid #2a3048;font-size:12px;color:var(--text-muted)">
     No credentials saved for this project yet.
     <span style="color:#6366f1;cursor:pointer;font-weight:600" onclick="navigate('settings')">
       Add them in Account & Settings →
