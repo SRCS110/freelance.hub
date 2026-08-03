@@ -48,7 +48,7 @@ function userSettingsHTML() {
 
 <!-- ── Profile ─────────────────────────────────────────────── -->
 <div class="card" style="margin-bottom:20px">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #2a3048">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
     <span style="font-size:20px">◎</span>
     <div class="section-title" style="color:#6366f1">Profile</div>
   </div>
@@ -72,7 +72,7 @@ function userSettingsHTML() {
 
 <!-- ── Preferences ────────────────────────────────────────── -->
 <div class="card" style="margin-bottom:20px">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #2a3048">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
     <span style="font-size:20px">◳</span>
     <div class="section-title" style="color:#10b981">Preferences</div>
   </div>
@@ -121,7 +121,7 @@ function userSettingsHTML() {
 
 <!-- ── Project Credentials ─────────────────────────────────── -->
 <div class="card" style="margin-bottom:20px">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;padding-bottom:14px;border-bottom:1px solid #2a3048">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;padding-bottom:14px;border-bottom:1px solid var(--border)">
     <span style="font-size:20px">◉</span>
     <div>
       <div class="section-title" style="color:#f59e0b">Project Credentials</div>
@@ -141,21 +141,43 @@ function userSettingsHTML() {
 
 <!-- ── Security ───────────────────────────────────────────── -->
 <div class="card" style="margin-bottom:20px">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #2a3048">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
     <span style="font-size:20px">◆</span>
-    <div class="section-title" style="color:#f43f5e">Security</div>
+    <div class="section-title" style="color:var(--danger)">Security</div>
   </div>
 
-  <div style="margin-bottom:20px">
-    <div style="font-size:13px;color:var(--text);font-weight:500;margin-bottom:4px">Change Password</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">A reset link will be sent to <strong style="color:var(--text)">${usr?.email || ""}</strong></div>
-    <button class="btn btn-ghost" onclick="sendPasswordReset()">Send Reset Email</button>
+  <!-- Credential PIN -->
+  <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text)">Credential PIN</div>
+      ${hasPinSet()
+        ? `<span style="font-size:10px;color:var(--accent);font-weight:700;background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);padding:2px 8px;border-radius:3px;font-family:'JetBrains Mono',monospace">SET</span>`
+        : `<span style="font-size:10px;color:var(--danger);font-weight:700;background:color-mix(in srgb,var(--danger) 10%,transparent);border:1px solid color-mix(in srgb,var(--danger) 30%,transparent);padding:2px 8px;border-radius:3px;font-family:'JetBrains Mono',monospace">NOT SET</span>`}
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.6">
+      ${hasPinSet()
+        ? "Required to view passwords and credentials. Session stays unlocked for 15 min after entry."
+        : "Set a PIN to protect bookmark passwords and project credentials."}
+    </div>
+    <div class="btn-row">
+      ${hasPinSet()
+        ? `<button class="btn btn-ghost btn-sm" onclick="requirePin(()=>_showChangePinFlow())">change pin</button>
+           <button class="btn btn-danger btn-sm" onclick="_showResetPinModal()">remove pin</button>
+           ${pinSessionActive() ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent)">◆ session active</span>` : ""}`
+        : `<button class="btn btn-primary btn-sm" onclick="requirePin(()=>{render()})">set up pin</button>`}
+    </div>
   </div>
 
-  <div style="padding-top:16px;border-top:1px solid #2a3048">
-    <div style="font-size:13px;color:var(--text);font-weight:500;margin-bottom:4px">Sign Out Everywhere</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Clears your session tokens on this device.</div>
-    <button class="btn btn-danger" onclick="doSignOut()">Sign Out</button>
+  <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Change Password</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-bottom:12px">A reset link will be sent to <strong style="color:var(--text)">${usr?.email || ""}</strong></div>
+    <button class="btn btn-ghost btn-sm" onclick="sendPasswordReset()">send reset email</button>
+  </div>
+
+  <div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">Sign Out</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-bottom:12px">Clears your session tokens on this device.</div>
+    <button class="btn btn-danger btn-sm" onclick="doSignOut()">sign out</button>
   </div>
 </div>`;
 }
@@ -167,7 +189,7 @@ function _projectCredBlock(p) {
   const goOk  = !!(creds.google_client_id && creds.google_client_secret);
 
   return `
-<div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #2a3048">
+<div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
     <div>
       <div style="font-weight:600;color:var(--text);font-size:14px">${p.name}</div>
@@ -181,7 +203,7 @@ function _projectCredBlock(p) {
 
   <div class="form-row" style="margin-bottom:10px">
     <div class="form-group" style="margin-bottom:0">
-      <label class="form-label" style="color:#3ecf8e">Supabase URL</label>
+      <label class="form-label" style="color:var(--accent)">Supabase URL</label>
       <div class="conn-input-wrap">
         <input class="conn-input${creds.supabase_url ? " filled" : ""}"
           id="pc-${p.id}-supabase_url" value="${creds.supabase_url || ""}"
@@ -189,7 +211,7 @@ function _projectCredBlock(p) {
       </div>
     </div>
     <div class="form-group" style="margin-bottom:0">
-      <label class="form-label" style="color:#3ecf8e">Supabase Anon Key</label>
+      <label class="form-label" style="color:var(--accent)">Supabase Anon Key</label>
       <div class="conn-input-wrap">
         <input class="conn-input${creds.supabase_anon_key ? " filled" : ""}" type="password"
           id="pc-${p.id}-supabase_anon_key" value="${creds.supabase_anon_key || ""}"
