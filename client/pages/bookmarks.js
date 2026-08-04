@@ -70,13 +70,31 @@ function _bookmarkCard(b) {
   ${b.description ? `<div style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;line-height:1.5">${b.description}</div>` : ""}
 
   ${hasCreds ? `
-  <div style="padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;display:flex;flex-direction:column;gap:6px">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px">credentials</div>
-    ${b.login_email    ? `<div class="bookmark-cred">@ <span>${b.login_email}</span><button class="bookmark-cred-reveal" onclick="navigator.clipboard.writeText('${b.login_email.replace(/'/g,"\\'")}');this.textContent='copied!';setTimeout(()=>this.textContent='copy',1200)">copy</button></div>` : ""}
-    ${b.login_username ? `<div class="bookmark-cred">id <span>${b.login_username}</span><button class="bookmark-cred-reveal" onclick="navigator.clipboard.writeText('${b.login_username.replace(/'/g,"\\'")}');this.textContent='copied!';setTimeout(()=>this.textContent='copy',1200)">copy</button></div>` : ""}
-    ${b.login_password ? `<div class="bookmark-cred">pw <span id="pw-${b.id}">••••••••</span>
-      <button class="bookmark-cred-reveal" onclick="toggleBmPw('${b.id}','${b.login_password.replace(/'/g,"\\'")}')">show</button>
-      <button class="bookmark-cred-reveal" onclick="navigator.clipboard.writeText('${b.login_password.replace(/'/g,"\\'")}');this.textContent='copied!';setTimeout(()=>this.textContent='copy',1200)">copy</button>
+  <div style="padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;display:flex;flex-direction:column;gap:6px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px">
+      credentials <span style="color:var(--accent);font-size:9px">◆ pin protected</span>
+    </div>
+    ${b.login_email    ? `<div class="bookmark-cred">@
+      <span style="color:var(--text)">${b.login_email}</span>
+      <button class="bookmark-cred-reveal"
+        data-val="${b.login_email.replace(/"/g,'&quot;')}"
+        onclick="bmCopy(this)">copy</button>
+    </div>` : ""}
+    ${b.login_username ? `<div class="bookmark-cred">id
+      <span style="color:var(--text)">${b.login_username}</span>
+      <button class="bookmark-cred-reveal"
+        data-val="${b.login_username.replace(/"/g,'&quot;')}"
+        onclick="bmCopy(this)">copy</button>
+    </div>` : ""}
+    ${b.login_password ? `<div class="bookmark-cred">pw
+      <span id="pw-${b.id}" style="color:var(--text);letter-spacing:2px">••••••••</span>
+      <button class="bookmark-cred-reveal"
+        data-id="${b.id}"
+        data-pw="${b.login_password.replace(/"/g,'&quot;')}"
+        onclick="bmShowPw(this)">show</button>
+      <button class="bookmark-cred-reveal"
+        data-val="${b.login_password.replace(/"/g,'&quot;')}"
+        onclick="bmCopy(this)">copy</button>
     </div>` : ""}
   </div>` : ""}
 
@@ -93,20 +111,27 @@ window.bmShowPw = function(btn) {
   const pw = btn.dataset.pw;
   const el = document.getElementById("pw-" + id);
   if (!el) return;
+
+  // If already revealed, hide it
   if (el.textContent !== "••••••••") {
     el.textContent = "••••••••";
     el.style.letterSpacing = "2px";
     btn.textContent = "show";
     return;
   }
+
+  // Require PIN before revealing
   requirePin(() => {
     el.textContent = pw;
     el.style.letterSpacing = "normal";
     btn.textContent = "hide";
+    // Auto-hide after 30 seconds
     setTimeout(() => {
-      el.textContent = "••••••••";
-      el.style.letterSpacing = "2px";
-      btn.textContent = "show";
+      if (el.textContent !== "••••••••") {
+        el.textContent = "••••••••";
+        el.style.letterSpacing = "2px";
+        btn.textContent = "show";
+      }
     }, 30000);
   });
 };
@@ -114,7 +139,7 @@ window.bmShowPw = function(btn) {
 window.bmCopy = function(btn) {
   const val = btn.dataset.val;
   requirePin(() => {
-    navigator.clipboard.writeText(val);
+    navigator.clipboard.writeText(val).catch(() => {});
     const orig = btn.textContent;
     btn.textContent = "copied!";
     setTimeout(() => btn.textContent = orig, 1500);
