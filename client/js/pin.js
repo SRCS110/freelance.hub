@@ -186,16 +186,38 @@ window._submitVerifyPin = async function() {
 };
 
 // ── Reset PIN (requires re-auth via Supabase) ─────────────────
-window._showResetPinModal = function() {
+window._showResetPinModal = async function() {
   closeModal();
-  showModal(`
+
+  // Detect if user signed in via OAuth (no password to verify with)
+  const session = await Auth.getSession();
+  const provider = session?.user?.app_metadata?.provider || "email";
+  const isOAuth  = provider !== "email";
+
+  if (isOAuth) {
+    // OAuth users — just confirm intent, no password needed
+    showModal(`
+<div class="modal-header">
+  <div class="modal-title">remove pin</div>
+  <button class="modal-close" onclick="closeModal()">×</button>
+</div>
+<div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-bottom:20px;line-height:1.6">
+  You signed in with Google, so we can't verify via password.<br/>
+  Are you sure you want to remove your credential PIN?
+</div>
+<div id="pin-reset-msg" style="display:none;margin-bottom:12px"></div>
+<div class="modal-actions">
+  <button class="btn btn-ghost" onclick="closeModal()">cancel</button>
+  <button class="btn btn-danger" id="pin-reset-btn" onclick="_clearPinDirect()">yes, remove pin</button>
+</div>`);
+  } else {
+    showModal(`
 <div class="modal-header">
   <div class="modal-title">reset pin</div>
   <button class="modal-close" onclick="closeModal()">×</button>
 </div>
 <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-bottom:20px;line-height:1.6">
-  To reset your PIN, re-enter your account password.<br/>
-  This verifies your identity before clearing the PIN.
+  Re-enter your account password to verify identity before clearing the PIN.
 </div>
 <div class="form-group">
   <label class="form-label">account password</label>
@@ -208,6 +230,21 @@ window._showResetPinModal = function() {
   <button class="btn btn-ghost" onclick="closeModal()">cancel</button>
   <button class="btn btn-primary" id="pin-reset-btn" onclick="_submitPinReset()">verify & reset</button>
 </div>`);
+  }
+};
+
+window._clearPinDirect = async function() {
+  try {
+    const existing = STATE.data.user_settings;
+    if (existing?.id) await db.update("user_settings", existing.id, { pin_hash: null });
+    clearPinSession();
+    await loadAll();
+    closeModal();
+    setTimeout(() => showModal(`
+<div class="modal-header"><div class="modal-title">pin removed</div><button class="modal-close" onclick="closeModal()">×</button></div>
+<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);margin-bottom:20px">PIN removed. You can set a new one any time from Account & Settings.</div>
+<div class="modal-actions"><button class="btn btn-primary" onclick="closeModal()">done</button></div>`), 200);
+  } catch(e) { alert(e.message); }
 };
 
 window._submitPinReset = async function() {
