@@ -66,111 +66,118 @@ window.deleteInv       = async function(id) { if (!confirm("Delete this invoice?
 
 // ── Print / PDF export ─────────────────────────────────────────
 window.printInvoice = async function(id) {
-  const inv     = STATE.data.invoices.find(i => i.id === id);
+  const inv   = STATE.data.invoices.find(i => i.id === id);
   if (!inv) return;
-  const items   = await _fetchItems(id);
-  const cfg     = getConfig();
-  const bizName = STATE.data.business_plan?.business_name || cfg.app_name || "FreelanceHub";
+  const items = await _fetchItems(id);
+  const bizName = STATE.data.user_settings?.business_name ||
+                  STATE.data.business_plan?.business_name || "FreelanceHub";
 
-  const win = window.open("", "_blank");
-  win.document.write(`<!DOCTYPE html>
-<html><head><title>Invoice ${inv.invoice_number}</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #1e293b; padding: 48px; background: #fff; }
-  .inv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
-  .inv-biz    { font-size: 22px; font-weight: 700; color: #6366f1; }
-  .inv-meta   { text-align: right; color: #64748b; }
-  .inv-meta strong { color: #1e293b; }
-  .inv-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 36px; }
-  .inv-party h3 { font-size: 10px; text-transform: uppercase; letter-spacing: .6px; color: #94a3b8; margin-bottom: 6px; }
-  .inv-party p  { font-size: 14px; font-weight: 600; color: #1e293b; }
-  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-  th { text-align: left; padding: 10px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: .6px; color: #94a3b8; border-bottom: 2px solid #e2e8f0; }
-  td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
-  .right { text-align: right; }
-  .totals-row { display: flex; justify-content: flex-end; }
-  .totals     { min-width: 260px; }
-  .tot-line   { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: #64748b; }
-  .tot-total  { display: flex; justify-content: space-between; padding: 12px 0 0; font-size: 18px; font-weight: 700; color: #6366f1; border-top: 2px solid #e2e8f0; margin-top: 6px; }
-  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-  .status-Paid    { background:#dcfce7; color:#16a34a; }
-  .status-Sent    { background:#dbeafe; color:#2563eb; }
-  .status-Draft   { background:#f1f5f9; color:var(--text-muted); }
-  .status-Overdue { background:#fee2e2; color:#dc2626; }
-  .status-Void    { background:#f1f5f9; color:#94a3b8; text-decoration:line-through; }
-  .notes { margin-top: 24px; padding: 16px; background: #f8fafc; border-radius: 8px; font-size: 12px; color: #64748b; }
-  .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; text-align: center; }
-  @media print { body { padding: 24px; } }
-</style>
-</head><body>
-<div class="inv-header">
-  <div>
-    <div class="inv-biz">${bizName}</div>
-  </div>
-  <div class="inv-meta">
-    <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px">INVOICE</div>
-    <div><strong>#${inv.invoice_number}</strong></div>
-    <div>Issued: ${new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</div>
-    ${inv.due_date ? `<div>Due: <strong>${fmtDate(inv.due_date)}</strong></div>` : ""}
-    <div style="margin-top:8px"><span class="status-badge status-${inv.status}">${inv.status}</span></div>
-  </div>
-</div>
+  // Load jsPDF if not already loaded
+  if (!window.jspdf) {
+    await new Promise((res, rej) => {
+      const s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
 
-<div class="inv-parties">
-  <div class="inv-party">
-    <h3>Bill To</h3>
-    <p>${inv.client_name || "—"}</p>
-    ${inv.project_name ? `<div style="color:var(--text-muted);margin-top:4px">Re: ${inv.project_name}</div>` : ""}
-  </div>
-</div>
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const W   = 210;
+  const M   = 18; // margin
+  const CW  = W - M * 2; // content width
+  let   y   = M;
 
-${items.length > 0 ? `
-<table>
-  <thead><tr><th>Description</th><th class="right">Qty</th><th class="right">Rate</th><th class="right">Amount</th></tr></thead>
-  <tbody>
-    ${items.map(it => `
-    <tr>
-      <td>${it.description}</td>
-      <td class="right">${Number(it.quantity)}</td>
-      <td class="right">${usd(it.unit_price)}</td>
-      <td class="right" style="font-weight:600">${usd(it.amount)}</td>
-    </tr>`).join("")}
-  </tbody>
-</table>` : `
-<table>
-  <thead><tr><th>Description</th><th class="right">Amount</th></tr></thead>
-  <tbody><tr><td>${inv.notes || "Services rendered"}</td><td class="right" style="font-weight:600">${usd(inv.amount)}</td></tr></tbody>
-</table>`}
+  // Helpers
+  const line  = (x1, y1, x2, y2, color = "#e2e2e8") => { doc.setDrawColor(color); doc.line(x1, y1, x2, y2); };
+  const text  = (str, x, yy, opts = {}) => {
+    doc.setFont("helvetica", opts.bold ? "bold" : "normal");
+    doc.setFontSize(opts.size || 10);
+    doc.setTextColor(opts.color || "#18181b");
+    doc.text(String(str || ""), x, yy, { align: opts.align || "left", maxWidth: opts.maxWidth });
+  };
 
-<div class="totals-row">
-  <div class="totals">
-    <div class="tot-total"><span>Total Due</span><span>${usd(inv.amount)}</span></div>
-  </div>
-</div>
+  // ── Header ──────────────────────────────────────────────────
+  text(bizName, M, y + 6, { size: 18, bold: true, color: "#059669" });
+  text("INVOICE", W - M, y + 4, { size: 20, bold: true, align: "right", color: "#18181b" });
+  text(`#${inv.invoice_number}`, W - M, y + 10, { size: 11, align: "right", color: "#71717a" });
+  y += 18;
+  line(M, y, W - M, y);
+  y += 6;
 
-${inv.notes && items.length > 0 ? `<div class="notes"><strong>Notes:</strong> ${inv.notes}</div>` : ""}
-<div class="footer">Thank you for your business.</div>
-</body></html>`);
-  win.document.close();
+  // ── Meta row ────────────────────────────────────────────────
+  text("Issued:", M, y, { size: 9, color: "#71717a" });
+  text(new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}), M + 16, y, { size: 9 });
+  if (inv.due_date) {
+    text("Due:", M + 60, y, { size: 9, color: "#71717a" });
+    text(new Date(inv.due_date).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}), M + 72, y, { size: 9 });
+  }
+  text("Status:", W - M - 30, y, { size: 9, color: "#71717a" });
+  text(inv.status, W - M, y, { size: 9, bold: true, align: "right" });
+  y += 10;
 
-  // Safari blocks window.open popups — use a blob URL as fallback
-  setTimeout(() => {
-    try {
-      win.print();
-    } catch(e) {
-      // If print blocked, offer download instead
-      const blob = new Blob([win.document.documentElement.outerHTML], { type: "text/html" });
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement("a");
-      a.href     = url;
-      a.download = `invoice-${inv.invoice_number}.html`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-  }, 500);
+  // ── Bill To ─────────────────────────────────────────────────
+  text("BILL TO", M, y, { size: 8, bold: true, color: "#71717a" });
+  y += 5;
+  text(inv.client_name || "—", M, y, { size: 11, bold: true });
+  if (inv.project_name) { y += 5; text(`Re: ${inv.project_name}`, M, y, { size: 9, color: "#71717a" }); }
+  y += 12;
+  line(M, y, W - M, y);
+  y += 6;
+
+  // ── Line items ───────────────────────────────────────────────
+  if (items.length > 0) {
+    // Header row
+    doc.setFillColor("#f4f4f5");
+    doc.rect(M, y - 3, CW, 8, "F");
+    text("Description", M + 2, y + 2, { size: 8, bold: true, color: "#71717a" });
+    text("Qty",    M + CW * 0.60, y + 2, { size: 8, bold: true, color: "#71717a", align: "right" });
+    text("Rate",   M + CW * 0.75, y + 2, { size: 8, bold: true, color: "#71717a", align: "right" });
+    text("Amount", M + CW + 2,    y + 2, { size: 8, bold: true, color: "#71717a", align: "right" });
+    y += 9;
+
+    items.forEach(it => {
+      text(it.description, M + 2, y, { size: 9, maxWidth: CW * 0.55 });
+      text(String(Number(it.quantity)), M + CW * 0.60, y, { size: 9, align: "right" });
+      text("$" + Number(it.unit_price).toFixed(2), M + CW * 0.75, y, { size: 9, align: "right" });
+      text("$" + Number(it.amount || it.quantity * it.unit_price).toFixed(2), M + CW + 2, y, { size: 9, bold: true, align: "right" });
+      y += 2;
+      line(M, y, W - M, y, "#f4f4f5");
+      y += 5;
+    });
+  } else {
+    text(inv.notes || "Services rendered", M + 2, y, { size: 9 });
+    text("$" + Number(inv.amount).toFixed(2), M + CW + 2, y, { size: 9, bold: true, align: "right" });
+    y += 8;
+  }
+
+  y += 2;
+  line(M, y, W - M, y);
+  y += 6;
+
+  // ── Total ────────────────────────────────────────────────────
+  text("Total Due", M + CW - 30, y, { size: 11, bold: true, align: "right" });
+  text("$" + Number(inv.amount).toFixed(2), M + CW + 2, y, { size: 14, bold: true, color: "#059669", align: "right" });
+  y += 12;
+
+  // ── Notes ────────────────────────────────────────────────────
+  if (inv.notes && items.length > 0) {
+    text("Notes", M, y, { size: 8, bold: true, color: "#71717a" });
+    y += 4;
+    text(inv.notes, M, y, { size: 9, color: "#71717a", maxWidth: CW });
+    y += 8;
+  }
+
+  // ── Footer ───────────────────────────────────────────────────
+  line(M, 277, W - M, 277);
+  text("Thank you for your business.", W / 2, 282, { size: 8, color: "#71717a", align: "center" });
+
+  // Download — no popup needed
+  doc.save(`invoice-${inv.invoice_number}.pdf`);
 };
 
+// ── Fetch line items ─────────────────────────────────────────
 // ── Fetch line items ──────────────────────────────────────────
 async function _fetchItems(invoiceId) {
   try {
