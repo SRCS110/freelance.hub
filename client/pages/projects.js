@@ -53,7 +53,7 @@ ${filtered.length === 0
   </div>
   <div style="display:flex;gap:14px;padding-top:12px;border-top:1px solid #2a3048">
     <span style="font-size:11px;color:${sbOk ? "#10b981" : "#64748b"};display:flex;align-items:center">
-      <span style="width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;background:${sbOk ? "#10b981" : "#2a3048"}"></span>Supabase</span>
+      <span style="width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;background:${sbOk ? "#10b981" : "#2a3048"}"></span>Server Credentials</span>
     <span style="font-size:11px;color:${goOk ? "#10b981" : "#64748b"};display:flex;align-items:center">
       <span style="width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;background:${goOk ? "#10b981" : "#2a3048"}"></span>Google OAuth</span>
   </div>
@@ -167,7 +167,7 @@ function connPanelHTML(pid) {
   <div class="conn-panel-header" style="cursor:default">
     <div class="conn-panel-title">🔌 Connection Credentials</div>
     <div class="conn-badges">
-      <span class="conn-badge ${sbOk ? "ok" : "miss"}">${sbOk ? "✓" : "○"} Supabase</span>
+      <span class="conn-badge ${sbOk ? "ok" : "miss"}">${sbOk ? "✓" : "○"} Server Credentials</span>
       <span class="conn-badge ${goOk ? "ok" : "miss"}">${goOk ? "✓" : "○"} Google OAuth</span>
       <button class="btn btn-ghost btn-sm" style="margin-left:12px;font-size:11px"
         onclick="navigate('settings')">Edit in Settings →</button>
@@ -302,6 +302,9 @@ function _todoListHTML(pid) {
     <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${PRI_COLOR[t.priority] || "var(--text-muted)"};flex-shrink:0">${PRI_DOT[t.priority] || "◇"}</span>
     <span style="flex:1;font-size:13px;color:var(--text);${t.completed ? "text-decoration:line-through" : ""};font-family:'JetBrains Mono',monospace">${t.title}</span>
     ${t.due_date ? `<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${new Date(t.due_date) < new Date() && !t.completed ? "var(--danger)" : "var(--text-muted)"}">${fmtDate(t.due_date)}</span>` : ""}
+    <button onclick="editTodo('${t.id}')"
+      style="background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;padding:2px 6px;line-height:1;flex-shrink:0;font-family:'JetBrains Mono',monospace;border:1px solid var(--border);border-radius:3px"
+      title="edit">edit</button>
     <button onclick="deleteTodo('${t.id}')"
       style="background:none;border:none;color:var(--border-2);font-size:14px;cursor:pointer;padding:0;line-height:1;flex-shrink:0"
       onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--border-2)'">×</button>
@@ -375,6 +378,50 @@ window.toggleTodo = async function(id, currentlyDone) {
     }
     _refreshTodoList(STATE.openProject?.id);
   } catch(e) { console.error(e); }
+};
+
+window.editTodo = function(id) {
+  const t = (STATE.data.project_todos || []).find(x => x.id === id);
+  if (!t) return;
+  showModal(`
+<div class="modal-header">
+  <div class="modal-title">edit task</div>
+  <button class="modal-close" onclick="closeModal()">×</button>
+</div>
+<div class="form-group">
+  <label class="form-label">Task</label>
+  <input id="todo-edit-title" value="${t.title.replace(/"/g,'&quot;')}" placeholder="task title…"/>
+</div>
+<div class="form-row">
+  <div class="form-group">
+    <label class="form-label">Priority</label>
+    <select id="todo-edit-pri">
+      <option value="low"${t.priority==="low"?" selected":""}>low</option>
+      <option value="normal"${t.priority==="normal"?" selected":""}>normal</option>
+      <option value="high"${t.priority==="high"?" selected":""}>! high</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Due Date</label>
+    <input id="todo-edit-due" type="date" value="${t.due_date || ""}"/>
+  </div>
+</div>
+<div class="modal-actions">
+  <button class="btn btn-ghost" onclick="closeModal()">cancel</button>
+  <button class="btn btn-primary" onclick="updateTodo('${t.id}')">save</button>
+</div>`);
+};
+
+window.updateTodo = async function(id) {
+  const title    = document.getElementById("todo-edit-title")?.value.trim();
+  const priority = document.getElementById("todo-edit-pri")?.value;
+  const due_date = document.getElementById("todo-edit-due")?.value || null;
+  if (!title) return;
+  try {
+    await db.update("project_todos", id, { title, priority, due_date });
+    closeModal();
+    await loadAll();
+  } catch(e) { alert(e.message); }
 };
 
 window.deleteTodo = async function(id) {

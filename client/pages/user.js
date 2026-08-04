@@ -50,7 +50,7 @@ function userSettingsHTML() {
 <div class="card" style="margin-bottom:20px">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
     <span style="font-size:20px">◎</span>
-    <div class="section-title" style="color:#6366f1">Profile</div>
+    <div class="section-title" style="color:var(--accent)">Profile</div>
   </div>
 
   <div class="form-row">
@@ -74,7 +74,7 @@ function userSettingsHTML() {
 <div class="card" style="margin-bottom:20px">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
     <span style="font-size:20px">◳</span>
-    <div class="section-title" style="color:#10b981">Preferences</div>
+    <div class="section-title" style="color:var(--accent)">Preferences</div>
   </div>
 
   <div class="form-row">
@@ -124,7 +124,7 @@ function userSettingsHTML() {
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;padding-bottom:14px;border-bottom:1px solid var(--border)">
     <span style="font-size:20px">◉</span>
     <div>
-      <div class="section-title" style="color:#f59e0b">Project Credentials</div>
+      <div class="section-title" style="color:var(--warning)">Project Credentials</div>
       <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
         Per-project Supabase and OAuth credentials — stored in your database, available on every device.
       </div>
@@ -196,14 +196,14 @@ function _projectCredBlock(p) {
       <div style="font-size:11px;color:var(--text-muted)">${p.client_name || "No client"}</div>
     </div>
     <div style="display:flex;gap:8px">
-      <span class="conn-badge ${sbOk ? "ok" : "miss"}">${sbOk ? "✓" : "○"} Supabase</span>
+      <span class="conn-badge ${sbOk ? "ok" : "miss"}">${sbOk ? "✓" : "○"} Server Credentials</span>
       <span class="conn-badge ${goOk ? "ok" : "miss"}">${goOk ? "✓" : "○"} Google OAuth</span>
     </div>
   </div>
 
   <div class="form-row" style="margin-bottom:10px">
     <div class="form-group" style="margin-bottom:0">
-      <label class="form-label" style="color:var(--accent)">Supabase URL</label>
+      <label class="form-label" style="color:var(--accent)">Server URL</label>
       <div class="conn-input-wrap">
         <input class="conn-input${creds.supabase_url ? " filled" : ""}"
           id="pc-${p.id}-supabase_url" value="${creds.supabase_url || ""}"
@@ -211,7 +211,7 @@ function _projectCredBlock(p) {
       </div>
     </div>
     <div class="form-group" style="margin-bottom:0">
-      <label class="form-label" style="color:var(--accent)">Supabase Anon Key</label>
+      <label class="form-label" style="color:var(--accent)">Server Anon Key</label>
       <div class="conn-input-wrap">
         <input class="conn-input${creds.supabase_anon_key ? " filled" : ""}" type="password"
           id="pc-${p.id}-supabase_anon_key" value="${creds.supabase_anon_key || ""}"
@@ -248,7 +248,7 @@ function _projectCredBlock(p) {
   <div style="display:flex;gap:8px;align-items:center">
     <button class="conn-save-btn" onclick="saveProjCreds('${p.id}')">Save</button>
     <button class="conn-clear-btn" onclick="clearProjCreds('${p.id}')">Clear</button>
-    <span id="pc-saved-${p.id}" style="display:none;font-size:12px;color:#10b981">saved</span>
+    <span id="pc-saved-${p.id}" style="display:none;font-size:12px;color:var(--accent)">saved</span>
   </div>
 </div>`;
 }

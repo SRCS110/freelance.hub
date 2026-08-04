@@ -48,7 +48,7 @@ function invoicesHTML() {
           <td style="color:${inv.status === 'Overdue' ? '#f43f5e' : '#64748b'}">${fmtDate(inv.due_date)}</td>
           <td>${badge(inv.status)}</td>
           <td><div class="btn-row" style="flex-wrap:wrap">
-            <button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="printInvoice('${inv.id}')">🖨 Print</button>
+            <button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="printInvoice('${inv.id}')">⎙ print / save</button>
             ${inv.status !== "Paid" && inv.status !== "Void" ? `<button class="btn btn-ghost btn-sm" style="color:#10b981;border-color:#10b98144;font-size:11px" onclick="updateInvStatus('${inv.id}','Paid')">✓ Paid</button>` : ""}
             ${inv.status === "Draft" ? `<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="updateInvStatus('${inv.id}','Sent')">Send</button>` : ""}
             ${inv.status !== "Void" && inv.status !== "Paid" ? `<button class="btn btn-ghost btn-sm" style="font-size:11px;color:#f59e0b;border-color:#f59e0b44" onclick="updateInvStatus('${inv.id}','Void')">Void</button>` : ""}
@@ -153,7 +153,22 @@ ${inv.notes && items.length > 0 ? `<div class="notes"><strong>Notes:</strong> ${
 <div class="footer">Thank you for your business.</div>
 </body></html>`);
   win.document.close();
-  setTimeout(() => { win.print(); }, 400);
+
+  // Safari blocks window.open popups — use a blob URL as fallback
+  setTimeout(() => {
+    try {
+      win.print();
+    } catch(e) {
+      // If print blocked, offer download instead
+      const blob = new Blob([win.document.documentElement.outerHTML], { type: "text/html" });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = `invoice-${inv.invoice_number}.html`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  }, 500);
 };
 
 // ── Fetch line items ──────────────────────────────────────────

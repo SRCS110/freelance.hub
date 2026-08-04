@@ -63,7 +63,7 @@ function dashboardHTML() {
 </div>
 
 ${overdue > 0 ? `
-<div style="margin-bottom:20px;padding:10px 16px;background:#f43f5e11;border:1px solid #f43f5e33;border-radius:10px;font-size:13px;color:#f43f5e;display:flex;align-items:center;gap:8px">
+<div style="margin-bottom:20px;padding:10px 16px;background:color-mix(in srgb,var(--danger) 8%,transparent);border:1px solid color-mix(in srgb,var(--danger) 25%,transparent);border-radius:4px;font-size:13px;color:var(--danger);display:flex;align-items:center;gap:8px">
   ! <strong>${overdue} overdue invoice${overdue !== 1 ? "s" : ""}</strong> — follow up with clients before the balance grows.
   <button class="btn btn-ghost btn-sm" style="margin-left:auto;color:#f43f5e;border-color:#f43f5e44;font-size:11px" onclick="navigate('invoices')">View →</button>
 </div>` : ""}
@@ -72,7 +72,7 @@ ${overdue > 0 ? `
   ${stats.map(s => `
   <div class="card">
     <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${s.color};letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;opacity:.7">◆</div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:18px;margin-bottom:10px;color:#808b9e">${s.icon}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:18px;margin-bottom:10px;color:var(--text-muted)">${s.icon}</div>
     <div class="card-label">${s.label}</div>
     <div class="card-value" style="color:${s.color}">${s.val}</div>
     <div class="card-sub">${s.sub}</div>
@@ -83,13 +83,13 @@ ${overdue > 0 ? `
   <div class="card">
     <div class="section-title" style="margin-bottom:14px">Recent Projects</div>
     ${projects.length === 0
-      ? `<div style="color:#64748b;font-size:13px">No projects yet. <span style="color:#6366f1;cursor:pointer" onclick="navigate('projects')">Add one →</span></div>`
+      ? `<div style="color:var(--text-muted);font-size:13px">No projects yet. <span style="color:#6366f1;cursor:pointer" onclick="navigate('projects')">Add one →</span></div>`
       : `<table class="tbl">
           <thead><tr><th>Project</th><th>Client</th><th>Status</th></tr></thead>
           <tbody>${projects.slice(0, 5).map(p => `
           <tr onclick="window.openProject(${JSON.stringify(p).replace(/"/g,"&quot;")})" style="cursor:pointer">
-            <td style="font-weight:600;color:#fff">${p.name}</td>
-            <td style="color:#64748b">${p.client_name || "—"}</td>
+            <td style="font-weight:600;color:var(--text)">${p.name}</td>
+            <td style="color:var(--text-muted)">${p.client_name || "—"}</td>
             <td>${badge(p.status)}</td>
           </tr>`).join("")}</tbody>
         </table>`}
@@ -97,20 +97,20 @@ ${overdue > 0 ? `
   <div class="card">
     <div class="section-title" style="margin-bottom:16px">Tax Estimate</div>
     <div style="margin-bottom:12px">
-      <div style="font-size:12px;color:#64748b;margin-bottom:3px">Net Profit (${DASH_PERIODS[period]})</div>
-      <div style="font-size:22px;font-weight:700;color:#fff;font-family:'Space Grotesk',sans-serif">${usd(rev - exp)}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px">Net Profit (${DASH_PERIODS[period]})</div>
+      <div style="font-size:22px;font-weight:700;color:var(--text);font-family:'Space Grotesk',sans-serif">${usd(rev - exp)}</div>
     </div>
     <div style="margin-bottom:12px">
-      <div style="font-size:12px;color:#64748b;margin-bottom:3px">Estimated Tax (25%)</div>
-      <div style="font-size:22px;font-weight:700;color:#f59e0b;font-family:'Space Grotesk',sans-serif">${usd(tax)}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px">Estimated Tax (25%)</div>
+      <div style="font-size:22px;font-weight:700;color:var(--warning);font-family:'JetBrains Mono',monospace">${usd(tax)}</div>
     </div>
     <div class="progress-bar">
       <div class="progress-fill" style="width:${rev > 0 ? Math.min(100, (exp / rev) * 100) : 0}%"></div>
     </div>
-    <div style="font-size:11px;color:#64748b;margin-top:5px">Expense ratio vs revenue</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:5px">Expense ratio vs revenue</div>
     ${tax > 0 ? `
-    <div style="margin-top:14px;padding:9px 12px;background:#0f1117;border-radius:8px;border:1px solid #2a3048;font-size:12px;color:#64748b">
-      💡 Set aside <strong style="color:#f59e0b">${usd(tax)}</strong> for quarterly taxes.
+    <div style="margin-top:14px;padding:9px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--text-muted)">
+      💡 Set aside <strong style="color:var(--warning)">${usd(tax)}</strong> for quarterly taxes.
     </div>` : ""}
   </div>
 </div>
@@ -119,14 +119,14 @@ ${overdue > 0 ? `
   <div class="card">
     <div class="section-title" style="margin-bottom:14px">Recent Invoices</div>
     ${invoices.length === 0
-      ? `<div style="color:#64748b;font-size:13px">No invoices yet. <span style="color:#6366f1;cursor:pointer" onclick="navigate('invoices')">Create one →</span></div>`
+      ? `<div style="color:var(--text-muted);font-size:13px">No invoices yet. <span style="color:#6366f1;cursor:pointer" onclick="navigate('invoices')">Create one →</span></div>`
       : `<table class="tbl">
           <thead><tr><th>#</th><th>Client</th><th>Amount</th><th>Status</th></tr></thead>
           <tbody>${invoices.slice(0, 6).map(i => `
           <tr>
-            <td style="color:#64748b">${i.invoice_number}</td>
+            <td style="color:var(--text-muted)">${i.invoice_number}</td>
             <td style="font-weight:600">${i.client_name || "—"}</td>
-            <td style="font-weight:700;color:#fff">${usd(i.amount)}</td>
+            <td style="font-weight:700;color:var(--text)">${usd(i.amount)}</td>
             <td>${badge(i.status)}</td>
           </tr>`).join("")}</tbody>
         </table>`}
@@ -154,3 +154,8 @@ ${overdue > 0 ? `
 
 window.setDashPeriod = function(p) { window._dashPeriod = p; render(); };
 window.dashboardHTML = dashboardHTML;
+
+window.openProjectById = function(id) {
+  const p = STATE.data.projects.find(x => x.id === id);
+  if (p) window.openProject(p);
+};
