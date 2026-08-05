@@ -183,6 +183,14 @@ body::before {
   <div class="msg" id="authMsg"></div>
 </div>
 
+<div style="text-align:center;margin-top:20px">
+  <a href="index.html?demo=true"
+    style="font-family:'JetBrains Mono',monospace;font-size:11px;
+           color:var(--text-muted);text-decoration:none;letter-spacing:.3px">
+    explore the demo →
+  </a>
+</div>
+
 <div class="brand-foot">freelance.srcs.online</div>
 
 <script>
@@ -195,6 +203,16 @@ function waitForAuth(cb, tries = 0) {
   if (window.Auth) { cb(); return; }
   if (tries < 100) setTimeout(() => waitForAuth(cb, tries + 1), 50);
   else console.error('[login] auth.js never loaded');
+}
+
+// Auto-switch to signup mode if coming from upgrade modal
+if (new URLSearchParams(location.search).get('signup') === 'true') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      const signupTab = document.querySelector('[data-mode="signup"]');
+      if (signupTab) signupTab.click();
+    }, 100);
+  });
 }
 
 waitForAuth(function() {
