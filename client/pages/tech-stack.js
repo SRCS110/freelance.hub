@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/tech-stack.js
+//  Freelancer — client/pages/tech-stack.js
 //  Tech stack recurring charges — monthly, annual, one-time.
 // ============================================================
 

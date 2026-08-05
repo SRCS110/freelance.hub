@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/bookmarks.js
+//  Freelancer — client/pages/bookmarks.js
 //  Bookmarks: websites, tools, and their login credentials.
 //  Credentials stored encrypted-at-rest in Supabase (RLS).
 // ============================================================

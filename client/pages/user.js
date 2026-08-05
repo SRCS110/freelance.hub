@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/user.js
+//  Freelancer — client/pages/user.js
 //  User settings — display name, timezone, tax rate, currency,
 //  and per-project credential management (stored in DB).
 // ============================================================

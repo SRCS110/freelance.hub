@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/dashboard.js
+//  Freelancer — client/pages/dashboard.js
 //  Dashboard with period filter + real-time tax estimate.
 // ============================================================
 

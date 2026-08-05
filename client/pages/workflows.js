@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/workflows.js
+//  Freelancer — client/pages/workflows.js
 //  SOPs + Pipeline runner.
 //  Templates define reusable step-by-step processes.
 //  Runs are live instances applied to a client or project.

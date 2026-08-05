@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/finances.js
+//  Freelancer — client/pages/finances.js
 //  Income, expenses, tax tracking — with period filter,
 //  project/client links, and Cancelled status support.
 // ============================================================

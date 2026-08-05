@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/business-plan.js
+//  Freelancer — client/pages/business-plan.js
 //  Business plan memorialization — one record per user.
 // ============================================================
 
@@ -150,7 +150,7 @@ window.saveBP = async function() {
 window.exportBP = function() {
   const bp = STATE.data.business_plan || _collectBP();
   const lines = [
-    `FREELANCEHUB — BUSINESS PLAN`,
+    `FREELANCER — BUSINESS PLAN`,
     `Exported: ${new Date().toLocaleDateString()}`,
     ``,
     `BUSINESS: ${bp.business_name || "—"}`,

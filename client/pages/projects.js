@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/projects.js
+//  Freelancer — client/pages/projects.js
 //  Projects list + Project File (with connection credentials)
 // ============================================================
 

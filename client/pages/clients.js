@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/clients.js
+//  Freelancer — client/pages/clients.js
 //  Client list + Client File with document storage.
 // ============================================================
 

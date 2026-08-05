@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/brainstorm.js
+//  Freelancer — client/pages/brainstorm.js
 //  Guided brainstorming — free-form notes, idea cards,
 //  prompted sessions for business planning and strategy.
 // ============================================================

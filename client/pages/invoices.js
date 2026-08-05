@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/pages/invoices.js
+//  Freelancer — client/pages/invoices.js
 //  Invoices with line items + PDF/print export.
 // ============================================================
 
@@ -70,7 +70,7 @@ window.printInvoice = async function(id) {
   if (!inv) return;
   const items = await _fetchItems(id);
   const bizName = STATE.data.user_settings?.business_name ||
-                  STATE.data.business_plan?.business_name || "FreelanceHub";
+                  STATE.data.business_plan?.business_name || "Freelancer";
 
   // Load jsPDF if not already loaded
   if (!window.jspdf) {
