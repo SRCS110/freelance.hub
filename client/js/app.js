@@ -66,6 +66,7 @@ async function loadAll() {
 function navigate(page) {
   STATE.page        = page;
   STATE.openProject = null;
+  if (page !== "clients") window._openClientId = null;
   render();
 }
 
