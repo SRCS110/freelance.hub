@@ -81,6 +81,7 @@ function sidebarHTML() {
   const displayName = s?.display_name || usr?.email?.split("@")[0] || "You";
   const overdueCt   = STATE.data.invoices.filter(i => i.status === "Overdue").length;
 
+  const demoBanner = window.DEMO_MODE ? demoBannerHTML() : "";
   const nav = [
     { id: "dashboard",     label: "Dashboard",     icon: "◈" },
     { id: "clients",       label: "Clients",        icon: "◎" },
@@ -102,6 +103,7 @@ function sidebarHTML() {
     </div>
     <div class="sidebar-sub">Business OS</div>
   </div>
+  ${demoBanner}
   ${nav.map(n => `
   <div class="nav-item${STATE.page === n.id ? " active" : ""}" onclick="navigate('${n.id}')">
     <span style="font-family:'JetBrains Mono',monospace;width:20px;text-align:center;font-size:13px">${n.icon}</span>
@@ -149,6 +151,7 @@ function mobileBarHTML() {
 }
 
 function _drawerNav() {
+  const demoBanner = window.DEMO_MODE ? demoBannerHTML() : "";
   const nav = [
     { id: "dashboard",     label: "Dashboard",    icon: "◈" },
     { id: "clients",       label: "Clients",       icon: "◎" },
@@ -279,17 +282,28 @@ function waitForAuth(cb, tries = 0) {
 }
 
 waitForAuth(async function() {
+  // ── Demo mode check ──────────────────────────────────────────
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("demo") === "true" || window.DEMO_MODE) {
+    window.STATE   = STATE;
+    window.loadAll = () => Promise.resolve(); // no-op in demo
+    window.render  = render;
+    activateDemo();
+    render();
+    return; // skip auth entirely
+  }
+
+  // ── Normal auth flow ─────────────────────────────────────────
   if (!hasConfig()) { window.location.href = "login.html"; return; }
 
   const session = await Auth.requireAuth();
-  if (!session) return; // requireAuth redirects if no session
+  if (!session) return;
 
   STATE.user     = session.user;
   window.STATE   = STATE;
   window.loadAll = loadAll;
   window.render  = render;
 
-  // Watch for sign-out from another tab
   Auth.onAuthStateChange((event, s) => {
     if (event === "SIGNED_OUT") window.location.href = "login.html";
   });
