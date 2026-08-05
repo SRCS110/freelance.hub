@@ -1,5 +1,5 @@
 /**
- * auth.js — FreelanceHub Authentication
+ * auth.js — Freelancer Authentication
  * ──────────────────────────────────────
  * Built on the Supabase JS v2 SDK (loaded via CDN in HTML).
  * Uses PKCE flow for cross-browser reliability (Safari, Edge, Chrome).
@@ -8,8 +8,8 @@
  * Find them at: Supabase Dashboard → Settings → API
  */
 
-const SUPABASE_URL  = 'https://mbprxgxtpwbaelrjwzam.supabase.co';  // https://xxxx.supabase.co
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1icHJ4Z3h0cHdiYWVscmp3emFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU1MzAwNzYsImV4cCI6MjEwMTEwNjA3Nn0.4WFvWXlLVowHx0-OrQoT96V7WDnRx0SDRsGj7pB_-BA';     // eyJhbGci...
+const SUPABASE_URL  = 'YOUR_SUPABASE_PROJECT_URL';  // https://xxxx.supabase.co
+const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';     // eyJhbGci...
 
 /* ── Internal client singleton ── */
 let _client = null;

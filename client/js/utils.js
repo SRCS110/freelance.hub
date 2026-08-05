@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/js/utils.js
+//  Freelancer — client/js/utils.js
 //  Shared formatting, UI helpers, and constants.
 // ============================================================
 

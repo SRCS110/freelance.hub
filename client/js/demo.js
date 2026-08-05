@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/js/demo.js
+//  Freelancer — client/js/demo.js
 //  Demo mode controller.
 //  Activated by DEMO_MODE = true in app.js boot.
 //  Intercepts all write operations and shows upgrade modal.
@@ -68,7 +68,7 @@ window.demoBannerHTML = function() {
     style="width:100%;padding:7px;background:var(--accent);color:var(--accent-fg);
            border:none;border-radius:3px;font-family:'JetBrains Mono',monospace;
            font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.3px">
-    start free trial →
+    start subscription →
   </button>
 </div>`;
 };

@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/js/pin.js
+//  Freelancer — client/js/pin.js
 //  In-app PIN system for viewing sensitive credentials.
 //
 //  PIN is hashed (SHA-256) before storing in user_settings.

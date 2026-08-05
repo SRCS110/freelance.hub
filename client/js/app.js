@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/js/app.js
+//  Freelancer — client/js/app.js
 //  App state, render router, and boot sequence.
 // ============================================================
 
@@ -99,7 +99,7 @@ function sidebarHTML() {
 <div class="sidebar">
   <div>
     <div class="sidebar-logo" onclick="navigate('dashboard')" style="cursor:pointer">
-      ${STATE.data.user_settings?.business_name || STATE.data.business_plan?.business_name || "FreelanceHub"}
+      ${STATE.data.user_settings?.business_name || STATE.data.business_plan?.business_name || "Freelancer"}
     </div>
     <div class="sidebar-sub">Business OS</div>
   </div>
@@ -136,7 +136,7 @@ function sidebarHTML() {
 function mobileBarHTML() {
   return `
 <div class="mobile-bar">
-  <div class="mobile-bar-logo" onclick="navigate('dashboard')" style="cursor:pointer">${STATE.data.user_settings?.business_name || STATE.data.business_plan?.business_name || "FreelanceHub"}</div>
+  <div class="mobile-bar-logo" onclick="navigate('dashboard')" style="cursor:pointer">${STATE.data.user_settings?.business_name || STATE.data.business_plan?.business_name || "Freelancer"}</div>
   <button class="hamburger" id="hamburger-btn" onclick="toggleDrawer()">
     <span></span><span></span><span></span>
   </button>

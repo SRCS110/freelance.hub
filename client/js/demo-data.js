@@ -1,5 +1,5 @@
 // ============================================================
-//  FreelanceHub — client/js/demo-data.js
+//  Freelancer — client/js/demo-data.js
 //  Seed data for demo mode. No Supabase calls made.
 //  All IDs are fake UUIDs — nothing touches the database.
 // ============================================================

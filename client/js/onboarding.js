@@ -1,11 +1,11 @@
 // ============================================================
-//  FreelanceHub — client/js/onboarding.js
+//  Freelancer — client/js/onboarding.js
 //  Auto-installs a "Getting Started" workflow on first login.
 //  Runs once per user — tracked via user_settings.onboarded.
 // ============================================================
 
 const GETTING_STARTED_TEMPLATE = {
-  name:        "Getting Started with FreelanceHub",
+  name:        "Getting Started with Freelancer",
   description: "A guided walkthrough to set up your business dashboard.",
   category:    "Admin",
   color:       "#3bf4a3",
@@ -171,7 +171,7 @@ function _showWelcomeToast() {
   `;
   toast.innerHTML = `
     <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px">
-      ◆ welcome to FreelanceHub
+      ◆ welcome to Freelancer
     </div>
     <div style="font-size:11px;color:var(--text-muted);line-height:1.5">
       A "Getting Started" workflow has been added to help you get set up.
