@@ -294,4 +294,5 @@ waitForAuth(async function() {
   });
 
   await loadAll();
+  await runOnboarding();
 });
