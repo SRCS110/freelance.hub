@@ -1,77 +1,121 @@
-# FreelanceHub
+# Freelancer
 
-Your all-in-one freelance business dashboard.
+Your all-in-one freelance business command center.
 
-## Folder Structure
+## What it does
+
+Freelancer is a web-based business OS for freelancers and small studios. It replaces the scattered mess of spreadsheets, notes apps, and invoicing tools with a single dark-mode dashboard that covers every part of running a client-based business.
+
+## Features
+
+| Section | What it does |
+|---------|-------------|
+| **Dashboard** | KPI cards (revenue, expenses, outstanding, active projects) with period filter. Overdue invoice alerts. Quick actions. |
+| **Clients** | Client card grid with full client file — contact info, linked projects, invoices, and document storage (contracts, NDAs, content forms, service agreements). |
+| **Projects** | Project cards with status filter. Per-project file with description, budget, deadline, connection credentials, and an iPhone-style to-do list with priorities and due dates. |
+| **Finances** | Income/expense log with period filter, project/client linking, tax estimate, and per-project income breakdown. |
+| **Invoices** | Line-item invoices with PDF export (via jsPDF — no popup). Draft → Sent → Paid / Void flow. |
+| **Business Plan** | Mission, vision, market, revenue model, SWOT, goals (90-day / 1-year / 5-year). Plain-text export. |
+| **Bookmarks** | Website and tool manager with PIN-protected credential storage (email, username, password). Monthly cost tracking. |
+| **Tech Stack** | Recurring subscription tracker — monthly burn, annual total, grouped by category. |
+| **Workflows** | Reusable SOP templates with ordered steps. Start a live "run" linked to a client or project and tick off steps with notes. |
+| **Brainstorm** | Guided thinking sessions (New Service Idea, Client Pitch, Quarterly Goals, Problem Solving) or free-form notes with tags. |
+| **Account & Settings** | Display name, business name, currency, tax rate, timezone. Credential PIN setup. Password reset. Billing section (coming soon). |
+
+## Demo mode
+
+Visit `freelance.srcs.online/index.html?demo=true` to explore the full product with sample data for a fictional design studio (Meridian Creative). Nothing is saved — all writes are intercepted and show a subscription prompt.
+
+## File structure
 
 ```
-freelance-hub/
-├── index.html              ← Open this in your browser. Never edit for credentials.
-├── login.html              ← Auth screen (email/password + Google OAuth when enabled).
-├── config/
-│   └── config.js           ← YOUR CREDENTIALS LIVE HERE. Edit once, never again.
+/
+├── index.html                  ← App shell. Open this in browser.
+├── login.html                  ← Auth screen (email/password + Google OAuth)
 ├── client/
 │   ├── css/
-│   │   └── styles.css      ← All styles for the entire app.
+│   │   └── styles.css          ← Full design system. Dark + light theme via CSS vars.
 │   ├── js/
-│   │   ├── supabase.js     ← Supabase API client (db calls, auto token refresh)
-│   │   ├── auth.js         ← Sign up, sign in, sign out, session restore + refresh
-│   │   ├── utils.js        ← Shared helpers: formatters, modal, swirl animation
-│   │   └── app.js          ← App state, render router, boot sequence
+│   │   ├── auth.js             ← Supabase SDK client, db helpers, session, OAuth
+│   │   ├── app.js              ← App state, render router, boot sequence
+│   │   ├── utils.js            ← Shared helpers: formatters, modal, badges
+│   │   ├── pin.js              ← In-app PIN system (SHA-256, 15-min session)
+│   │   ├── onboarding.js       ← Auto-installs Getting Started workflow on first login
+│   │   ├── demo-data.js        ← Seed data for demo mode
+│   │   └── demo.js             ← Demo mode controller + upgrade modal
 │   └── pages/
-│       ├── dashboard.js    ← Dashboard (period filter, overdue alert, quick actions)
-│       ├── clients.js      ← Client CRM
-│       ├── projects.js     ← Projects list + Project File + Connection Panel
-│       ├── finances.js     ← Finances + period filter + project/client linking
-│       ├── invoices.js     ← Invoices with line items + PDF/print export
-│       └── business-plan.js ← Business plan (mission, SWOT, goals, export)
+│       ├── dashboard.js
+│       ├── clients.js
+│       ├── projects.js
+│       ├── finances.js
+│       ├── invoices.js
+│       ├── business-plan.js
+│       ├── bookmarks.js
+│       ├── tech-stack.js
+│       ├── workflows.js
+│       ├── brainstorm.js
+│       └── user.js
 └── docs/
-    └── schema.sql          ← Run once in Supabase SQL Editor to create all tables.
+    └── schema.sql              ← Run once in Supabase SQL Editor to create all tables.
 ```
 
-## Setup (one time)
+## Setup
 
-1. **Create Supabase tables** — go to your Supabase project → SQL Editor → paste and run `docs/schema.sql`
-2. **Set credentials** — open `config/config.js` and paste your Supabase URL and anon key
-3. **Open the app** — open `index.html` in your browser
+### 1. Supabase tables
 
-> ⚠️ If you were already running a previous version of FreelanceHub, re-run the schema.sql to
-> add the new `invoice_items` and `business_plan` tables, and the `project_id`/`client_id` columns
-> on `finances`. The script is idempotent (safe to re-run).
+Go to **Supabase → SQL Editor**, paste `docs/schema.sql`, and run it. Safe to re-run (uses `IF NOT EXISTS` throughout).
 
-## What's in each page
+### 2. Add your credentials
 
-| Page | What it does |
-|------|-------------|
-| Dashboard | KPI cards with period filter (month/quarter/year/all-time), overdue invoice alert, quick actions |
-| Clients | Full client CRM — name, company, email, phone, notes, status |
-| Projects | Project cards with status filter; per-project file with Connection Credentials panel |
-| Finances | Income/expense log with period filter, project/client linking, tax estimate, per-project breakdown |
-| Invoices | Line-item invoices with print/PDF export; Draft → Sent → Paid / Void flow |
-| Business Plan | Mission, vision, market, revenue model, goals, SWOT, plaintext export |
+Open `client/js/auth.js` and fill in the two constants at the top:
 
-## Session handling
+```js
+const SUPABASE_URL  = 'https://your-project.supabase.co';
+const SUPABASE_ANON = 'eyJhbGci...';
+```
 
-Auth tokens are automatically refreshed before they expire (Supabase JWTs default to 1 hour).
-If a refresh fails (e.g. you were offline), you'll be redirected to the login page.
+Find these at **Supabase → Settings → API**. The anon key is public-safe — RLS policies protect your data. Never put the `service_role` key here.
 
-## File responsibilities
+### 3. Open the app
 
-| File | What to edit it for |
-|------|---------------------|
-| `config/config.js` | Changing Supabase or OAuth credentials |
-| `client/css/styles.css` | Any visual/design changes |
-| `client/js/supabase.js` | Changing how db calls work |
-| `client/js/auth.js` | Changing login logic, token behavior, or adding OAuth providers |
-| `client/pages/dashboard.js` | Dashboard layout changes |
-| `client/pages/projects.js` | Project page or connection panel changes |
-| `client/pages/finances.js` | Finance tracking changes |
-| `client/pages/invoices.js` | Invoice or line-item changes |
-| `client/pages/business-plan.js` | Business plan sections or export format |
-| `docs/schema.sql` | Adding new tables to Supabase |
+Open `index.html` in a browser or push to GitHub Pages.
 
-## Notes on localStorage
+## Authentication
 
-Project-level credentials (Supabase URL, anon key, OAuth secrets entered via the Connection
-Panel) are stored in `localStorage` on this device only. Do not use shared/public computers
-to store production secrets here.
+- Email/password sign-in and sign-up
+- Google OAuth (configure credentials in **Supabase → Authentication → Providers → Google**)
+- JWT tokens auto-refresh — session stays active without re-login
+- On first login, a "Getting Started" workflow is automatically installed
+
+## Security
+
+- **Row Level Security** — every table has RLS enabled. Users can only read/write their own data.
+- **Credential PIN** — bookmark passwords and project credentials require a 4–8 digit PIN. Hashed with SHA-256 before storage. Session active for 15 minutes per verification.
+- **Anon key** — safe to commit. It cannot bypass RLS. Never commit the `service_role` key.
+- **Google OAuth secrets** — live only in Supabase's dashboard, never in code.
+
+## Theme
+
+Supports dark mode (default) and light mode. Toggle in the sidebar footer. Preference saved to `localStorage`.
+
+Design system: JetBrains Mono + Inter, brutalist terminal aesthetic, neon mint accent (`#3bf4a3`), CSS custom properties throughout.
+
+## Roadmap
+
+- [ ] Stripe subscription ($12/mo) — gates data storage behind payment
+- [ ] iOS app (React Native / Expo) — same Supabase backend
+- [ ] Client portal — share project status and invoices with clients
+- [ ] Push notifications — overdue invoice and workflow step reminders
+- [ ] Onboarding email sequences — automated emails to new clients
+
+## What to edit
+
+| File | Edit when you want to… |
+|------|----------------------|
+| `client/js/auth.js` | Change Supabase credentials or OAuth behavior |
+| `client/css/styles.css` | Change any visual styling or theme colors |
+| `client/js/app.js` | Add a new page to the nav or change boot behavior |
+| `client/js/demo-data.js` | Update the demo mode sample data |
+| `client/js/onboarding.js` | Change the Getting Started workflow steps |
+| `docs/schema.sql` | Add new database tables |
+| `login.html` | Change the login/signup screen |
